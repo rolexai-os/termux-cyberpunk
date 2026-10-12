@@ -5,7 +5,7 @@ DATA="$HOME/.local/share/termux-cyberpunk"
 REPO_FILE="$DATA/repo-path"
 REPO_DIR=''
 [ ! -f "$REPO_FILE" ] || REPO_DIR="$(cat "$REPO_FILE")"
-ACTION="\${1:-menu}"
+ACTION="${1:-menu}"
 case "$ACTION" in
   settings)
     mkdir -p "$(dirname "$CONFIG")"
