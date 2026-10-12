@@ -23,7 +23,7 @@ set_config() {
 while true; do
   load_config
   printf '\n\033[1;36m=== CYBERPUNK THEME MANAGER ===\033[0m\n'
-  printf '1) Show banner + dashboard\n2) Refresh dashboard\n3) Test voice greeting\n4) Toggle startup animation (now: %s)\n5) Toggle automatic voice (now: %s)\n6) Change voice greeting\n7) Restore/uninstall\n0) Exit\n' "\${CYBERPUNK_ANIMATION:-1}" "\${CYBERPUNK_AUTO_VOICE:-0}"
+  printf '1) Show banner + dashboard\n2) Refresh dashboard\n3) Test voice greeting\n4) Toggle startup animation (now: %s)\n5) Toggle automatic voice (now: %s)\n6) Change voice greeting\n7) Choose terminal color theme\n8) Banner / FIGlet styles\n9) Font collection manager\n10) Update from GitHub\n11) Restore/uninstall\n0) Exit\n' "\${CYBERPUNK_ANIMATION:-1}" "\${CYBERPUNK_AUTO_VOICE:-0}"
   read -r -p 'Select: ' choice || exit 0
   case "$choice" in
     1) "$HOME/.local/bin/cyberpunk" ;;
@@ -38,7 +38,19 @@ while true; do
         set_config CYBERPUNK_VOICE_GREETING "\"$escaped\""
         echo "Greeting saved."
       fi ;;
-    7) read -r -p 'Restore/uninstall theme? [y/N] ' confirm || exit 0; case "$confirm" in y|Y|yes|YES) "$HOME/.local/bin/cyberpunk-restore"; exit $? ;; *) echo "Cancelled." ;; esac ;;
+    7)
+      "$HOME/.local/bin/cyberpunk-style" --list
+      read -r -p 'Theme name (empty cancels): ' theme || exit 0
+      [ -z "$theme" ] || "$HOME/.local/bin/cyberpunk-style" "$theme" ;;
+    8)
+      "$HOME/.local/bin/cyberpunk-art" --list
+      read -r -p 'Banner style (cyberpunk/matrix/compact/figlet/toilet/rainbow): ' art_style || exit 0
+      read -r -p 'Text to render (empty uses CYBERPUNK): ' art_text || exit 0
+      [ -n "$art_text" ] || art_text=CYBERPUNK
+      "$HOME/.local/bin/cyberpunk-art" "$art_style" "$art_text" ;;
+    9) "$HOME/.local/bin/cyberpunk-fonts" list ;;
+    10) read -r -p 'Update repository and reinstall? [y/N] ' confirm || exit 0; case "$confirm" in y|Y|yes|YES) "$HOME/.local/bin/cyberpunk-update" ;; *) echo "Cancelled." ;; esac ;;
+    11) read -r -p 'Restore/uninstall theme? [y/N] ' confirm || exit 0; case "$confirm" in y|Y|yes|YES) "$HOME/.local/bin/cyberpunk-restore"; exit $? ;; *) echo "Cancelled." ;; esac ;;
     0|q|Q) exit 0 ;;
     *) echo "Choose a listed option." ;;
   esac
