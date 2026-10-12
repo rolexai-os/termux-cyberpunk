@@ -2,14 +2,14 @@
 set -u
 CONFIG="$HOME/.config/termux-cyberpunk/config"
 [ -f "$CONFIG" ] && . "$CONFIG"
-GREETING="\${CYBERPUNK_VOICE_GREETING:-Good evening. All systems are online. How may I assist you?}"
-PITCH="\${CYBERPUNK_VOICE_PITCH:-0.82}"
-RATE="\${CYBERPUNK_VOICE_RATE:-0.90}"
-STYLE="\${CYBERPUNK_VOICE_STYLE:-cinematic}"
+GREETING="${CYBERPUNK_VOICE_GREETING:-Good evening. All systems are online. How may I assist you?}"
+PITCH="${CYBERPUNK_VOICE_PITCH:-0.82}"
+RATE="${CYBERPUNK_VOICE_RATE:-0.90}"
+STYLE="${CYBERPUNK_VOICE_STYLE:-cinematic}"
 case "$STYLE" in
-  cinematic) PITCH="\${CYBERPUNK_VOICE_PITCH:-0.82}"; RATE="\${CYBERPUNK_VOICE_RATE:-0.90}" ;;
-  balanced) PITCH="\${CYBERPUNK_VOICE_PITCH:-0.96}"; RATE="\${CYBERPUNK_VOICE_RATE:-1.00}" ;;
-  crisp) PITCH="\${CYBERPUNK_VOICE_PITCH:-0.92}"; RATE="\${CYBERPUNK_VOICE_RATE:-1.08}" ;;
+  cinematic) PITCH="${CYBERPUNK_VOICE_PITCH:-0.82}"; RATE="${CYBERPUNK_VOICE_RATE:-0.90}" ;;
+  balanced) PITCH="${CYBERPUNK_VOICE_PITCH:-0.96}"; RATE="${CYBERPUNK_VOICE_RATE:-1.00}" ;;
+  crisp) PITCH="${CYBERPUNK_VOICE_PITCH:-0.92}"; RATE="${CYBERPUNK_VOICE_RATE:-1.08}" ;;
   *) echo "Unknown voice profile '$STYLE'; use cinematic, balanced, or crisp." >&2; exit 2 ;;
 esac
 if ! command -v termux-tts-speak >/dev/null 2>&1; then
