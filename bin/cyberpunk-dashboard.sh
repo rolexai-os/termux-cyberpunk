@@ -6,11 +6,11 @@ CONFIG="$HOME/.config/termux-cyberpunk/config"
 line() { printf '%s------------------------------------------------%s\n' "$C" "$R"; }
 read_device() {
   local value=""
-  if [ -n "\${ANDROID_PRODUCT:-}" ]; then value="$ANDROID_PRODUCT"
-  elif [ -n "\${MODEL:-}" ]; then value="$MODEL"
+  if [ -n "${ANDROID_PRODUCT:-}" ]; then value="$ANDROID_PRODUCT"
+  elif [ -n "${MODEL:-}" ]; then value="$MODEL"
   elif command -v getprop >/dev/null 2>&1; then value="$(getprop ro.product.model 2>/dev/null)"
   fi
-  printf '%s' "\${value:-Android device (model unavailable)}"
+  printf '%s' "${value:-Android device (model unavailable)}"
 }
 show_dashboard() {
   line
@@ -33,8 +33,8 @@ show_dashboard() {
   else printf '%sBattery:%s Optional: install matching Termux:API app, then pkg install termux-api\n' "$Y" "$R"; fi
   line
 }
-if [ "\${1:-}" = "--watch" ] || [ "\${1:-}" = "-w" ]; then
-  interval="\${2:-5}"
+if [ "${1:-}" = "--watch" ] || [ "${1:-}" = "-w" ]; then
+  interval="${2:-5}"
   case "$interval" in *[!0-9]*|"") echo "Usage: cyberpunk-dashboard --watch [seconds]" >&2; exit 2 ;; esac
   [ "$interval" -ge 2 ] || interval=2
   while :; do clear 2>/dev/null || true; show_dashboard; printf 'Refreshing every %s seconds. Press Ctrl+C to stop.\n' "$interval"; sleep "$interval"; done
