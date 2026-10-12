@@ -10,7 +10,9 @@ A lightweight, reversible terminal customization toolkit for Termux on Android 1
 - Font manager for local TrueType fonts, with backup, restore and reset commands
 - Font-family collection guide for JetBrains Mono, Fira Code, Hack, Ubuntu Mono, Source Code Pro, Iosevka and MesloLGS NF
 - Device, Android version, date/time, uptime, memory, storage, and optional battery dashboard
-- Optional spoken greeting through Termux:API, with configurable greeting text
+- Cinematic AI-assistant voice profile with adjustable Android TTS pitch and rate (voice timbre depends on the installed Android TTS engine)
+- Animated digital boot/loading screen and automatic banner/dashboard on interactive shell startup
+- Clean settings manager with safe settings reset, theme-cache refresh and confirmed fresh reinstall
 - Interactive manager and one-command GitHub updater
 - Backup-aware installer and conservative restore/uninstall
 - Dashboard refresh mode: `cyberpunk-dashboard --watch [seconds]`
@@ -57,7 +59,10 @@ bash install.sh
 
 ```bash
 cyberpunk                         # Banner + one-shot dashboard
-cyberpunk-manager                 # Interactive menu
+cyberpunk-manager                 # Clean interactive control center
+cyberpunk-clean settings          # Back up and reset Cyberpunk settings
+cyberpunk-clean themes            # Refresh only Cyberpunk's cached theme presets
+cyberpunk-clean fresh             # Confirmed fresh reinstall with backups
 cyberpunk-style --list            # List available color themes
 cyberpunk-style matrix            # Apply Matrix Green palette
 cyberpunk-style dracula           # Apply Dracula palette
@@ -73,7 +78,7 @@ cyberpunk-fonts reset             # Remove custom font; use Termux default
 cyberpunk-update                  # Pull latest main and reinstall
 cyberpunk-dashboard               # One-shot system dashboard
 cyberpunk-dashboard --watch 10    # Refresh every 10 seconds
-cyberpunk-voice                   # Speak configured greeting
+cyberpunk-voice                   # Speak configured cinematic AI greeting
 cyberpunk-restore                 # Restore theme configuration and uninstall commands
 ```
 
@@ -117,14 +122,34 @@ Edit `~/.config/termux-cyberpunk/config`:
 
 ```bash
 CYBERPUNK_ANIMATION=1
+CYBERPUNK_LOADING=1
+CYBERPUNK_AUTO_START=1
 CYBERPUNK_AUTO_VOICE=0
-CYBERPUNK_VOICE_GREETING="Cyberpunk terminal online. Systems ready."
+CYBERPUNK_VOICE_STYLE=cinematic
+CYBERPUNK_VOICE_PITCH=0.82
+CYBERPUNK_VOICE_RATE=0.90
+CYBERPUNK_VOICE_GREETING="Good evening. All systems are online. How may I assist you?"
 ```
 
+- `CYBERPUNK_LOADING=0` disables the digital boot animation.
 - `CYBERPUNK_ANIMATION=0` disables the short banner animation.
-- `CYBERPUNK_AUTO_VOICE=1` speaks on each `cyberpunk` command invocation.
+- `CYBERPUNK_AUTO_START=0` disables the banner/dashboard on each new interactive shell; re-enable it in `cyberpunk-manager`.
+- `CYBERPUNK_AUTO_VOICE=1` speaks the greeting on each `cyberpunk` command invocation.
+- `CYBERPUNK_VOICE_STYLE` accepts `cinematic`, `balanced` or `crisp`; pitch and rate can also be adjusted.
 - `CYBERPUNK_VOICE_GREETING` sets the text passed to Android text-to-speech.
 - Use `cyberpunk-manager` to change settings without manually editing the config.
+
+### Cinematic assistant voice
+
+The `cinematic` profile requests a lower pitch and slower delivery from Android TTS. This creates an original, polished futuristic-assistant style; it does not clone Tony Stark, Robert Downey Jr., or any actor's voice. The actual timbre depends on the voice and engine selected in Android **Settings → Text-to-speech output**. Install Termux:API from the same source/signing family as Termux, then run `pkg install termux-api`. Test with `cyberpunk-voice` or select a profile in `cyberpunk-manager`.
+
+### Clean settings and fresh install
+
+- `cyberpunk-clean settings` backs up and resets this project's settings.
+- `cyberpunk-clean themes` backs up and refreshes only Cyberpunk's cached theme presets.
+- `cyberpunk-clean fresh` requires you to type `FRESH`, backs up current Termux palette/property files, resets Cyberpunk settings and reapplies the repository defaults before reinstalling.
+
+These commands do **not** remove unrelated Android/Termux themes or apps. The fresh-install option is limited to this project and keeps backups so you can recover your previous settings.
 
 ## Backups and restore safety
 
