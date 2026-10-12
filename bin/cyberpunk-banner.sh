@@ -14,7 +14,7 @@ cat <<'ART'
      /____/
 ART
 printf '%s  C Y B E R P U N K   T E R M U X%s\n' "$GREEN" "$RESET"
-if [ "\${CYBERPUNK_ANIMATION:-1}" = "1" ]; then
+if [ "${CYBERPUNK_ANIMATION:-1}" = "1" ]; then
   printf '%s' "$DIM"
   for frame in 'INITIALIZING NEURAL LINK' 'LOADING TERMINAL MODULES' 'SYSTEM READY'; do
     printf '\r[+] %-30s' "$frame"
