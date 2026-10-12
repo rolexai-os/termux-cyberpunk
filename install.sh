@@ -33,8 +33,14 @@ for pair in ".bashrc:bashrc" ".termux/colors.properties:colors.properties" ".ter
   if [ -f "$HOME/$src" ]; then cp -p "$HOME/$src" "$BACKUP/$name"; fi
 done
 for f in ".bashrc" ".termux/colors.properties" ".termux/termux.properties"; do [ -e "$HOME/$f" ] || echo "$f" >> "$BACKUP/created-by-installer.txt"; done
-cp "$ROOT/config/colors.properties" "$HOME/.termux/colors.properties"
-cp "$ROOT/config/termux.properties" "$HOME/.termux/termux.properties"
+# Preserve customized settings on upgrades. If a file still matches the previous installed snapshot,
+# it is safe to refresh it from the repository; if it differs, assume the user customized it.
+PRESERVE_COLORS=0
+PRESERVE_PROPERTIES=0
+if [ -f "$BASELINE/installed/colors.properties" ] && [ -f "$HOME/.termux/colors.properties" ] && ! cmp -s "$HOME/.termux/colors.properties" "$BASELINE/installed/colors.properties"; then PRESERVE_COLORS=1; fi
+if [ -f "$BASELINE/installed/termux.properties" ] && [ -f "$HOME/.termux/termux.properties" ] && ! cmp -s "$HOME/.termux/termux.properties" "$BASELINE/installed/termux.properties"; then PRESERVE_PROPERTIES=1; fi
+if [ "$PRESERVE_COLORS" = 0 ]; then cp "$ROOT/config/colors.properties" "$HOME/.termux/colors.properties"; else echo "Preserving customized terminal colors."; fi
+if [ "$PRESERVE_PROPERTIES" = 0 ]; then cp "$ROOT/config/termux.properties" "$HOME/.termux/termux.properties"; else echo "Preserving customized Termux properties."; fi
 for file in cyberpunk cyberpunk-banner.sh cyberpunk-dashboard.sh cyberpunk-voice.sh cyberpunk-dashboard cyberpunk-voice cyberpunk-manager cyberpunk-restore cyberpunk-style cyberpunk-art cyberpunk-fonts cyberpunk-update; do cp "$ROOT/bin/$file" "$HOME/.local/bin/$file"; done
 THEME_HOME="$HOME/.local/share/termux-cyberpunk/themes"
 mkdir -p "$THEME_HOME"
