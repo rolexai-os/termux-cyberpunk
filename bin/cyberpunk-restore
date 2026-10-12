@@ -1,0 +1,40 @@
+#!/data/data/com.termux/files/usr/bin/bash
+set -u
+BACKUP_ROOT="$HOME/.local/share/termux-cyberpunk/backups"
+if [ ! -d "$BACKUP_ROOT" ]; then
+  echo "No backup directory found: $BACKUP_ROOT"
+  exit 1
+fi
+LATEST="$(find "$BACKUP_ROOT" -mindepth 1 -maxdepth 1 -type d | sort | tail -n 1)"
+if [ -z "$LATEST" ]; then echo "No backups found."; exit 1; fi
+echo "Restoring from: $LATEST"
+for f in bashrc colors.properties termux.properties; do
+  case "$f" in
+    bashrc) dest="$HOME/.bashrc" ;;
+    colors.properties) dest="$HOME/.termux/colors.properties" ;;
+    termux.properties) dest="$HOME/.termux/termux.properties" ;;
+  esac
+  if [ -f "$LATEST/$f" ]; then
+    mkdir -p "$(dirname "$dest")"
+    cp "$LATEST/$f" "$dest"
+    echo "Restored $dest"
+  fi
+done
+if [ -f "$LATEST/created-by-installer.txt" ]; then
+  while IFS= read -r rel; do
+    [ -n "$rel" ] || continue
+    case "$rel" in
+      .bashrc|.termux/colors.properties|.termux/termux.properties)
+        if [ ! -f "$LATEST/$(basename "$rel")" ]; then
+          rm -f "$HOME/$rel"
+          echo "Removed installer-created $HOME/$rel"
+        fi
+        ;;
+    esac
+  done < "$LATEST/created-by-installer.txt"
+fi
+rm -rf "$HOME/.local/bin/cyberpunk" "$HOME/.local/bin/cyberpunk-dashboard" \
+  "$HOME/.local/bin/cyberpunk-voice" "$HOME/.local/bin/cyberpunk-restore" \
+  "$HOME/.local/bin/cyberpunk-banner.sh" "$HOME/.local/bin/cyberpunk-dashboard.sh" \
+  "$HOME/.local/bin/cyberpunk-voice.sh" "$HOME/.config/termux-cyberpunk"
+echo "Restore complete. Restart Termux. Review any other custom edits made after installation."
