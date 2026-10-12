@@ -43,6 +43,20 @@ CFG
     read -r -p 'Continue? Type FRESH to confirm: ' confirm
     [ "$confirm" = FRESH ] || { echo "Cancelled."; exit 0; }
     "$0" settings
+    if [ -n "$REPO_DIR" ] && [ -d "$REPO_DIR/config" ]; then
+      RESET_BACKUP="$DATA/fresh-install-backups/$(date +%Y%m%d-%H%M%S)"
+      mkdir -p "$RESET_BACKUP" "$HOME/.termux"
+      [ ! -f "$HOME/.termux/colors.properties" ] || cp -p "$HOME/.termux/colors.properties" "$RESET_BACKUP/colors.properties"
+      [ ! -f "$HOME/.termux/termux.properties" ] || cp -p "$HOME/.termux/termux.properties" "$RESET_BACKUP/termux.properties"
+      cp "$REPO_DIR/config/colors.properties" "$HOME/.termux/colors.properties"
+      cp "$REPO_DIR/config/termux.properties" "$HOME/.termux/termux.properties"
+      if [ -d "$DATA/themes" ]; then
+        mkdir -p "$DATA/theme-backups"
+        cp -a "$DATA/themes" "$DATA/theme-backups/themes-before-fresh-$(date +%Y%m%d-%H%M%S)"
+        rm -f "$DATA"/themes/*.properties
+      fi
+      echo "Previous palette/property files saved to: $RESET_BACKUP"
+    fi
     if [ -n "$REPO_DIR" ] && [ -f "$REPO_DIR/install.sh" ]; then
       bash "$REPO_DIR/install.sh"
     else
