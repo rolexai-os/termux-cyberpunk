@@ -1,0 +1,46 @@
+#!/data/data/com.termux/files/usr/bin/bash
+set -u
+STYLE="\${1:-cyberpunk}"
+shift 2>/dev/null || true
+TEXT="\${*:-CYBERPUNK}"
+case "$STYLE" in
+  --list|list)
+    echo "Built-in: cyberpunk, matrix, compact"
+    echo "Optional renderers: figlet, toilet, lolcat (install with pkg)"
+    exit 0 ;;
+  cyberpunk)
+    printf '\033[1;36m'
+    cat <<'ART'
+   ______      __                 __
+  / ____/_  __/ /_  ___  ______  / /____  ____  __ __
+ / /   / / / / __ \/ _ \/ ___/ / __/ _ \/ __ \/ // /
+/ /___/ /_/ / /_/ /  __/ /    / /_/  __/ / / / , <
+\____/\__, /_.___/\___/_/     \__/\___/_/ /_/_/|_|
+     /____/
+ART
+    printf '\033[0m\n'
+    ;;
+  matrix)
+    printf '\033[1;32m'
+    if command -v figlet >/dev/null 2>&1; then figlet -f slant "$TEXT" 2>/dev/null || figlet "$TEXT"
+    else printf '>>> %s <<<\n' "$TEXT"; fi
+    printf '\033[0m'
+    ;;
+  compact)
+    printf '\033[1;35m[ %s ]\033[0m\n' "$TEXT"
+    ;;
+  figlet)
+    if ! command -v figlet >/dev/null 2>&1; then echo "Install optional FIGlet: pkg install figlet" >&2; exit 1; fi
+    figlet "$TEXT"
+    ;;
+  toilet)
+    if ! command -v toilet >/dev/null 2>&1; then echo "Install optional TOIlet: pkg install toilet" >&2; exit 1; fi
+    toilet -f future "$TEXT"
+    ;;
+  rainbow)
+    if command -v toilet >/dev/null 2>&1 && command -v lolcat >/dev/null 2>&1; then toilet -f future "$TEXT" | lolcat
+    elif command -v figlet >/dev/null 2>&1 && command -v lolcat >/dev/null 2>&1; then figlet "$TEXT" | lolcat
+    else echo "Rainbow style needs figlet or toilet plus lolcat. Try: pkg install figlet toilet lolcat" >&2; exit 1; fi
+    ;;
+  *) echo "Unknown banner style: $STYLE. Use cyberpunk-art --list." >&2; exit 2 ;;
+esac
