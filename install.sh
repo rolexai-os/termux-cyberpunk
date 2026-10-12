@@ -20,7 +20,7 @@ if [ ! -d "$BASELINE" ]; then
     for f in bashrc colors.properties termux.properties created-by-installer.txt; do [ ! -f "$FIRST_EXISTING/$f" ] || cp -p "$FIRST_EXISTING/$f" "$BASELINE/$f"; done
   else
     for pair in ".bashrc:bashrc" ".termux/colors.properties:colors.properties" ".termux/termux.properties:termux.properties"; do
-      src="\${pair%%:*}"; name="\${pair##*:}"
+      src="${pair%%:*}"; name="${pair##*:}"
       if [ -f "$HOME/$src" ]; then cp -p "$HOME/$src" "$BASELINE/$name"; else echo "$src" >> "$BASELINE/created-by-installer.txt"; fi
     done
   fi
@@ -29,7 +29,7 @@ STAMP="$(date +%Y%m%d-%H%M%S)"
 BACKUP="$BACKUP_ROOT/$STAMP"
 mkdir -p "$BACKUP/installed" "$HOME/.termux" "$HOME/.config/termux-cyberpunk" "$HOME/.local/bin" "$HOME/.local/share/termux-cyberpunk"
 for pair in ".bashrc:bashrc" ".termux/colors.properties:colors.properties" ".termux/termux.properties:termux.properties"; do
-  src="\${pair%%:*}"; name="\${pair##*:}"
+  src="${pair%%:*}"; name="${pair##*:}"
   if [ -f "$HOME/$src" ]; then cp -p "$HOME/$src" "$BACKUP/$name"; fi
 done
 for f in ".bashrc" ".termux/colors.properties" ".termux/termux.properties"; do [ -e "$HOME/$f" ] || echo "$f" >> "$BACKUP/created-by-installer.txt"; done
