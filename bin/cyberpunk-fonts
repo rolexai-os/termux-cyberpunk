@@ -1,0 +1,50 @@
+#!/data/data/com.termux/files/usr/bin/bash
+set -euo pipefail
+FONT="$HOME/.termux/font.ttf"
+BACKUP_DIR="$HOME/.local/share/termux-cyberpunk/font-backups"
+ACTION="\${1:-list}"
+case "$ACTION" in
+  list|--list)
+    echo "Termux font manager"
+    if [ -f "$FONT" ]; then ls -lh "$FONT"; else echo "No custom font.ttf installed (Termux default font is active)."; fi
+    echo "Saved font backups:"
+    if [ -d "$BACKUP_DIR" ] && compgen -G "$BACKUP_DIR/font-*.ttf" >/dev/null; then ls -1 "$BACKUP_DIR"/font-*.ttf; else echo "  (none)"; fi
+    echo
+    echo "Recommended font families to explore with Termux:Styling:"
+    echo "  JetBrains Mono, Fira Code, Hack, Ubuntu Mono, Source Code Pro, Iosevka, MesloLGS NF"
+    echo "Install the official Termux:Styling add-on, then long-press terminal > More > Style > Choose font."
+    ;;
+  install)
+    SOURCE="\${2:-}"
+    [ -n "$SOURCE" ] || { echo "Usage: cyberpunk-fonts install /path/to/font.ttf" >&2; exit 2; }
+    [ -f "$SOURCE" ] || { echo "Font file not found: $SOURCE" >&2; exit 1; }
+    case "$SOURCE" in *.ttf|*.TTF) ;; *) echo "Choose a .ttf TrueType font file." >&2; exit 2 ;; esac
+    [ -s "$SOURCE" ] || { echo "Font file is empty." >&2; exit 1; }
+    mkdir -p "$BACKUP_DIR" "$(dirname "$FONT")"
+    if [ -f "$FONT" ]; then cp -p "$FONT" "$BACKUP_DIR/font-$(date +%Y%m%d-%H%M%S).ttf"; fi
+    cp "$SOURCE" "$FONT"
+    echo "Font copied to $FONT. Restart Termux to apply."
+    ;;
+  backup)
+    [ -f "$FONT" ] || { echo "No custom font.ttf to back up." >&2; exit 1; }
+    mkdir -p "$BACKUP_DIR"
+    cp -p "$FONT" "$BACKUP_DIR/font-manual-$(date +%Y%m%d-%H%M%S).ttf"
+    echo "Font backup saved in $BACKUP_DIR"
+    ;;
+  restore)
+    mkdir -p "$BACKUP_DIR"
+    latest="$(find "$BACKUP_DIR" -maxdepth 1 -type f -name 'font-*.ttf' | sort | tail -n 1)"
+    [ -n "$latest" ] || { echo "No font backups found." >&2; exit 1; }
+    cp "$latest" "$FONT"
+    echo "Restored $latest. Restart Termux to apply."
+    ;;
+  reset)
+    if [ -f "$FONT" ]; then
+      mkdir -p "$BACKUP_DIR"
+      cp -p "$FONT" "$BACKUP_DIR/font-before-reset-$(date +%Y%m%d-%H%M%S).ttf"
+      rm -f "$FONT"
+      echo "Removed custom font; Termux default font will be used after restart."
+    else echo "No custom font is installed."; fi
+    ;;
+  *) echo "Usage: cyberpunk-fonts {list|install FILE.ttf|backup|restore|reset}" >&2; exit 2 ;;
+esac
