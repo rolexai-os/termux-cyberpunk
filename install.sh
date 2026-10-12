@@ -1,16 +1,18 @@
 #!/data/data/com.termux/files/usr/bin/bash
 set -euo pipefail
 ROOT="$(cd "$(dirname "$0")" && pwd)"
-for required in config/colors.properties config/termux.properties bin/cyberpunk bin/cyberpunk-banner.sh bin/cyberpunk-dashboard.sh bin/cyberpunk-voice.sh bin/cyberpunk-manager bin/cyberpunk-restore; do
+for required in config/colors.properties config/termux.properties bin/cyberpunk bin/cyberpunk-banner.sh bin/cyberpunk-dashboard.sh bin/cyberpunk-voice.sh bin/cyberpunk-manager bin/cyberpunk-restore bin/cyberpunk-style bin/cyberpunk-art bin/cyberpunk-fonts bin/cyberpunk-update; do
   [ -f "$ROOT/$required" ] || { echo "Missing project file: $required" >&2; exit 1; }
 done
+[ -d "$ROOT/config/themes" ] || { echo "Missing theme collection: config/themes" >&2; exit 1; }
 if ! command -v pkg >/dev/null 2>&1; then echo "This installer requires Termux's pkg command. Run it inside Termux." >&2; exit 1; fi
 echo "Checking required Termux packages..."
 pkg install -y bash coreutils procps
+# Decorative tools are optional; the rest of the theme works without them.
+pkg install -y figlet toilet lolcat || echo "Optional FIGlet/TOIlet/lolcat packages unavailable; built-in banners still work."
 BACKUP_ROOT="$HOME/.local/share/termux-cyberpunk/backups"
 mkdir -p "$BACKUP_ROOT"
 BASELINE="$BACKUP_ROOT/original"
-# Preserve the first known pre-theme backup across updates, while keeping per-run snapshots.
 if [ ! -d "$BASELINE" ]; then
   mkdir -p "$BASELINE/installed"
   FIRST_EXISTING="$(find "$BACKUP_ROOT" -mindepth 1 -maxdepth 1 -type d ! -name original | sort | head -n 1)"
@@ -33,7 +35,11 @@ done
 for f in ".bashrc" ".termux/colors.properties" ".termux/termux.properties"; do [ -e "$HOME/$f" ] || echo "$f" >> "$BACKUP/created-by-installer.txt"; done
 cp "$ROOT/config/colors.properties" "$HOME/.termux/colors.properties"
 cp "$ROOT/config/termux.properties" "$HOME/.termux/termux.properties"
-for file in cyberpunk cyberpunk-banner.sh cyberpunk-dashboard.sh cyberpunk-voice.sh cyberpunk-dashboard cyberpunk-voice cyberpunk-manager cyberpunk-restore; do cp "$ROOT/bin/$file" "$HOME/.local/bin/$file"; done
+for file in cyberpunk cyberpunk-banner.sh cyberpunk-dashboard.sh cyberpunk-voice.sh cyberpunk-dashboard cyberpunk-voice cyberpunk-manager cyberpunk-restore cyberpunk-style cyberpunk-art cyberpunk-fonts cyberpunk-update; do cp "$ROOT/bin/$file" "$HOME/.local/bin/$file"; done
+THEME_HOME="$HOME/.local/share/termux-cyberpunk/themes"
+mkdir -p "$THEME_HOME"
+cp "$ROOT"/config/themes/*.properties "$THEME_HOME/"
+printf '%s\n' "$ROOT" > "$HOME/.local/share/termux-cyberpunk/repo-path"
 chmod +x "$HOME"/.local/bin/cyberpunk "$HOME"/.local/bin/cyberpunk-* "$HOME"/.local/bin/cyberpunk-restore
 if [ ! -f "$HOME/.config/termux-cyberpunk/config" ]; then
   cat > "$HOME/.config/termux-cyberpunk/config" <<'CFG'
@@ -66,6 +72,6 @@ echo
 echo "Cyberpunk theme installed."
 echo "Backup: $BACKUP"
 echo "Original baseline: $BASELINE"
-echo "Commands: cyberpunk, cyberpunk-manager, cyberpunk-dashboard --watch [seconds], cyberpunk-voice, cyberpunk-restore"
+echo "Commands: cyberpunk, cyberpunk-manager, cyberpunk-style --list, cyberpunk-art --list, cyberpunk-fonts, cyberpunk-update, cyberpunk-dashboard --watch [seconds], cyberpunk-voice, cyberpunk-restore"
 echo "Optional voice: install the matching Termux:API Android app, then run: pkg install termux-api"
 echo "Termux appearance changes take effect after restarting the session."
