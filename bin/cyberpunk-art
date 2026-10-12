@@ -1,8 +1,8 @@
 #!/data/data/com.termux/files/usr/bin/bash
 set -u
-STYLE="\${1:-cyberpunk}"
+STYLE="${1:-cyberpunk}"
 shift 2>/dev/null || true
-TEXT="\${*:-CYBERPUNK}"
+TEXT="${*:-CYBERPUNK}"
 case "$STYLE" in
   --list|list)
     echo "Built-in: cyberpunk, matrix, compact"
