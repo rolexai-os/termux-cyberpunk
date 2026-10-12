@@ -1,0 +1,23 @@
+#!/data/data/com.termux/files/usr/bin/bash
+set -euo pipefail
+THEME_DIR="$HOME/.local/share/termux-cyberpunk/themes"
+BACKUP_DIR="$HOME/.local/share/termux-cyberpunk/theme-backups"
+COLORS="$HOME/.termux/colors.properties"
+THEME="\${1:-}"
+if [ -z "$THEME" ] || [ "$THEME" = "--list" ] || [ "$THEME" = "list" ]; then
+  echo "Available themes:"
+  for f in "$THEME_DIR"/*.properties; do [ -f "$f" ] && printf '  %s\n' "$(basename "$f" .properties)"; done
+  echo
+  echo "Usage: cyberpunk-style <theme-name>"
+  exit 0
+fi
+case "$THEME" in *[!a-zA-Z0-9_-]*|'') echo "Invalid theme name." >&2; exit 2 ;; esac
+SOURCE="$THEME_DIR/$THEME.properties"
+[ -f "$SOURCE" ] || { echo "Unknown theme: $THEME. Run cyberpunk-style --list." >&2; exit 1; }
+mkdir -p "$BACKUP_DIR" "$(dirname "$COLORS")"
+if [ -f "$COLORS" ]; then
+  cp -p "$COLORS" "$BACKUP_DIR/colors-$(date +%Y%m%d-%H%M%S).properties"
+fi
+cp "$SOURCE" "$COLORS"
+if command -v termux-reload-settings >/dev/null 2>&1; then termux-reload-settings || true; fi
+printf 'Applied theme: %s\nRestart Termux if colors do not refresh.\n' "$THEME"
