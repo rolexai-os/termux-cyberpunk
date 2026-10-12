@@ -4,8 +4,9 @@ BACKUP_ROOT="$HOME/.local/share/termux-cyberpunk/backups"
 MARK_START="# >>> termux-cyberpunk >>>"
 MARK_END="# <<< termux-cyberpunk <<<"
 [ -d "$BACKUP_ROOT" ] || { echo "No backup directory found: $BACKUP_ROOT"; exit 1; }
-LATEST="$(find "$BACKUP_ROOT" -mindepth 1 -maxdepth 1 -type d | sort | tail -n 1)"
-[ -n "$LATEST" ] || { echo "No backups found."; exit 1; }
+LATEST="$BACKUP_ROOT/original"
+if [ ! -d "$LATEST" ]; then LATEST="$(find "$BACKUP_ROOT" -mindepth 1 -maxdepth 1 -type d | sort | tail -n 1)"; fi
+[ -n "$LATEST" ] && [ -d "$LATEST" ] || { echo "No backups found."; exit 1; }
 echo "Restoring from: $LATEST"
 if [ -f "$HOME/.bashrc" ]; then
   tmp="$(mktemp "$HOME/.bashrc.cyberpunk.XXXXXX")" || exit 1
@@ -26,4 +27,4 @@ restore_config() {
 restore_config ".termux/colors.properties" "colors.properties" "$HOME/.termux/colors.properties" "colors.properties"
 restore_config ".termux/termux.properties" "termux.properties" "$HOME/.termux/termux.properties" "termux.properties"
 rm -f "$HOME/.local/bin/cyberpunk" "$HOME/.local/bin/cyberpunk-dashboard" "$HOME/.local/bin/cyberpunk-voice" "$HOME/.local/bin/cyberpunk-restore" "$HOME/.local/bin/cyberpunk-manager" "$HOME/.local/bin/cyberpunk-banner.sh" "$HOME/.local/bin/cyberpunk-dashboard.sh" "$HOME/.local/bin/cyberpunk-voice.sh"
-echo "Restore complete. Restart Termux. Settings and backups were retained."
+echo "Restore complete. Restart Termux. Original backup history and user settings were retained."
