@@ -1,7 +1,7 @@
 #!/data/data/com.termux/files/usr/bin/bash
 set -euo pipefail
 ROOT="$(cd "$(dirname "$0")" && pwd)"
-for required in config/colors.properties config/termux.properties bin/cyberpunk bin/cyberpunk-banner.sh bin/cyberpunk-dashboard.sh bin/cyberpunk-voice.sh bin/cyberpunk-manager bin/cyberpunk-restore bin/cyberpunk-style bin/cyberpunk-art bin/cyberpunk-fonts bin/cyberpunk-update; do
+for required in config/colors.properties config/termux.properties bin/cyberpunk bin/cyberpunk-banner.sh bin/cyberpunk-dashboard.sh bin/cyberpunk-voice.sh bin/cyberpunk-manager bin/cyberpunk-restore bin/cyberpunk-loader bin/cyberpunk-clean bin/cyberpunk-style bin/cyberpunk-art bin/cyberpunk-fonts bin/cyberpunk-update; do
   [ -f "$ROOT/$required" ] || { echo "Missing project file: $required" >&2; exit 1; }
 done
 [ -d "$ROOT/config/themes" ] || { echo "Missing theme collection: config/themes" >&2; exit 1; }
@@ -41,7 +41,7 @@ if [ -f "$BASELINE/installed/colors.properties" ] && [ -f "$HOME/.termux/colors.
 if [ -f "$BASELINE/installed/termux.properties" ] && [ -f "$HOME/.termux/termux.properties" ] && ! cmp -s "$HOME/.termux/termux.properties" "$BASELINE/installed/termux.properties"; then PRESERVE_PROPERTIES=1; fi
 if [ "$PRESERVE_COLORS" = 0 ]; then cp "$ROOT/config/colors.properties" "$HOME/.termux/colors.properties"; else echo "Preserving customized terminal colors."; fi
 if [ "$PRESERVE_PROPERTIES" = 0 ]; then cp "$ROOT/config/termux.properties" "$HOME/.termux/termux.properties"; else echo "Preserving customized Termux properties."; fi
-for file in cyberpunk cyberpunk-banner.sh cyberpunk-dashboard.sh cyberpunk-voice.sh cyberpunk-dashboard cyberpunk-voice cyberpunk-manager cyberpunk-restore cyberpunk-style cyberpunk-art cyberpunk-fonts cyberpunk-update; do cp "$ROOT/bin/$file" "$HOME/.local/bin/$file"; done
+for file in cyberpunk cyberpunk-banner.sh cyberpunk-dashboard.sh cyberpunk-voice.sh cyberpunk-dashboard cyberpunk-voice cyberpunk-manager cyberpunk-restore cyberpunk-loader cyberpunk-clean cyberpunk-style cyberpunk-art cyberpunk-fonts cyberpunk-update; do cp "$ROOT/bin/$file" "$HOME/.local/bin/$file"; done
 THEME_HOME="$HOME/.local/share/termux-cyberpunk/themes"
 mkdir -p "$THEME_HOME"
 cp "$ROOT"/config/themes/*.properties "$THEME_HOME/"
@@ -49,30 +49,41 @@ printf '%s\n' "$ROOT" > "$HOME/.local/share/termux-cyberpunk/repo-path"
 chmod +x "$HOME"/.local/bin/cyberpunk "$HOME"/.local/bin/cyberpunk-* "$HOME"/.local/bin/cyberpunk-restore
 if [ ! -f "$HOME/.config/termux-cyberpunk/config" ]; then
   cat > "$HOME/.config/termux-cyberpunk/config" <<'CFG'
-# 1 enables the brief banner animation; 0 disables it.
 CYBERPUNK_ANIMATION=1
-# 1 speaks the greeting whenever the main command is run.
+CYBERPUNK_LOADING=1
+CYBERPUNK_AUTO_START=1
 CYBERPUNK_AUTO_VOICE=0
-# Customize the text spoken by Termux:API.
-CYBERPUNK_VOICE_GREETING="Cyberpunk terminal online. Systems ready."
+CYBERPUNK_VOICE_STYLE=cinematic
+CYBERPUNK_VOICE_PITCH=0.82
+CYBERPUNK_VOICE_RATE=0.90
+CYBERPUNK_VOICE_GREETING="Good evening. All systems are online. How may I assist you?"
 CFG
 fi
 for target in "$BACKUP" "$BASELINE"; do
   mkdir -p "$target/installed"
-  cp "$HOME/.termux/colors.properties" "$target/installed/colors.properties"
-  cp "$HOME/.termux/termux.properties" "$target/installed/termux.properties"
+  # Track the project's expected defaults, not user-customized live files.
+  cp "$ROOT/config/colors.properties" "$target/installed/colors.properties"
+  cp "$ROOT/config/termux.properties" "$target/installed/termux.properties"
 done
 touch "$HOME/.bashrc"
-if ! grep -Fq '# >>> termux-cyberpunk >>>' "$HOME/.bashrc"; then
+# Replace only our own marked block, preserving unrelated shell customizations.
+TMP_BASHRC="$(mktemp "$HOME/.bashrc.cyberpunk.XXXXXX")"
+awk -v start="# >>> termux-cyberpunk >>>" -v end="# <<< termux-cyberpunk <<<" '$0==start {skip=1; next} $0==end {skip=0; next} !skip {print}' "$HOME/.bashrc" > "$TMP_BASHRC"
+cat "$TMP_BASHRC" > "$HOME/.bashrc"
+rm -f "$TMP_BASHRC"
 cat >> "$HOME/.bashrc" <<'BASHRC'
 
 # >>> termux-cyberpunk >>>
 export PATH="$HOME/.local/bin:$PATH"
-# Run cyberpunk manually, or uncomment below for automatic startup.
-# cyberpunk
+if [[ $- == *i* ]]; then
+  CYBERPUNK_CONFIG="$HOME/.config/termux-cyberpunk/config"
+  if [[ -f "$CYBERPUNK_CONFIG" ]]; then . "$CYBERPUNK_CONFIG"; fi
+  if [[ "${CYBERPUNK_AUTO_START:-1}" == "1" ]] && [[ -x "$HOME/.local/bin/cyberpunk" ]]; then
+    "$HOME/.local/bin/cyberpunk"
+  fi
+fi
 # <<< termux-cyberpunk <<<
 BASHRC
-fi
 export PATH="$HOME/.local/bin:$PATH"
 echo
 echo "Cyberpunk theme installed."
