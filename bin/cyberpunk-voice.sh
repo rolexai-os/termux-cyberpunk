@@ -2,7 +2,7 @@
 set -u
 CONFIG="$HOME/.config/termux-cyberpunk/config"
 [ -f "$CONFIG" ] && . "$CONFIG"
-GREETING="\${CYBERPUNK_VOICE_GREETING:-Cyberpunk terminal online. Systems ready.}"
+GREETING="${CYBERPUNK_VOICE_GREETING:-Cyberpunk terminal online. Systems ready.}"
 if ! command -v termux-tts-speak >/dev/null 2>&1; then
   echo "Voice unavailable: termux-tts-speak was not found."
   echo "Install the Termux:API Android app from the same source as Termux, then run: pkg install termux-api"
