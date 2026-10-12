@@ -15,8 +15,8 @@ CFG
 load_config() { . "$CONFIG"; }
 set_config() {
   local key="$1" value="$2" tmp
-  tmp="$(mktemp "\${CONFIG}.XXXXXX")" || return 1
-  if grep -qE "^[[:space:]]*\${key}=" "$CONFIG"; then
+  tmp="$(mktemp "${CONFIG}.XXXXXX")" || return 1
+  if grep -qE "^[[:space:]]*${key}=" "$CONFIG"; then
     awk -v key="$key" -v value="$value" 'index($0,key "=")==1 {print key "=" value; next} {print}' "$CONFIG" > "$tmp"
   else
     cat "$CONFIG" > "$tmp"
@@ -35,7 +35,7 @@ while true; do
   printf '\n\033[1;36m╔══════════════════════════════════════╗\033[0m\n'
   printf '\033[1;36m║       CYBERPUNK CONTROL CENTER       ║\033[0m\n'
   printf '\033[1;36m╚══════════════════════════════════════╝\033[0m\n'
-  printf '1) Launch terminal dashboard\n2) Refresh system dashboard\n3) Test assistant voice\n4) Voice profile: %s\n5) Auto-start banner: %s\n6) Digital loading animation: %s\n7) Banner animation: %s\n8) Automatic voice: %s\n9) Change greeting\n10) Choose color theme\n11) Banner / FIGlet styles\n12) Font manager\n13) Clean settings / fresh install\n14) Update from GitHub\n15) Restore / uninstall\n0) Exit\n' "\${CYBERPUNK_VOICE_STYLE:-cinematic}" "\${CYBERPUNK_AUTO_START:-1}" "\${CYBERPUNK_LOADING:-1}" "\${CYBERPUNK_ANIMATION:-1}" "\${CYBERPUNK_AUTO_VOICE:-0}"
+  printf '1) Launch terminal dashboard\n2) Refresh system dashboard\n3) Test assistant voice\n4) Voice profile: %s\n5) Auto-start banner: %s\n6) Digital loading animation: %s\n7) Banner animation: %s\n8) Automatic voice: %s\n9) Change greeting\n10) Choose color theme\n11) Banner / FIGlet styles\n12) Font manager\n13) Clean settings / fresh install\n14) Update from GitHub\n15) Restore / uninstall\n0) Exit\n' "${CYBERPUNK_VOICE_STYLE:-cinematic}" "${CYBERPUNK_AUTO_START:-1}" "${CYBERPUNK_LOADING:-1}" "${CYBERPUNK_ANIMATION:-1}" "${CYBERPUNK_AUTO_VOICE:-0}"
   read -r -p 'Select: ' choice || exit 0
   case "$choice" in
     1) "$HOME/.local/bin/cyberpunk" ;;
@@ -50,10 +50,10 @@ while true; do
         3) set_config CYBERPUNK_VOICE_STYLE crisp; set_config CYBERPUNK_VOICE_PITCH 0.92; set_config CYBERPUNK_VOICE_RATE 1.08 ;;
         *) echo "Cancelled." ;;
       esac ;;
-    5) toggle CYBERPUNK_AUTO_START "\${CYBERPUNK_AUTO_START:-1}" ;;
-    6) toggle CYBERPUNK_LOADING "\${CYBERPUNK_LOADING:-1}" ;;
-    7) toggle CYBERPUNK_ANIMATION "\${CYBERPUNK_ANIMATION:-1}" ;;
-    8) toggle CYBERPUNK_AUTO_VOICE "\${CYBERPUNK_AUTO_VOICE:-0}" ;;
+    5) toggle CYBERPUNK_AUTO_START "${CYBERPUNK_AUTO_START:-1}" ;;
+    6) toggle CYBERPUNK_LOADING "${CYBERPUNK_LOADING:-1}" ;;
+    7) toggle CYBERPUNK_ANIMATION "${CYBERPUNK_ANIMATION:-1}" ;;
+    8) toggle CYBERPUNK_AUTO_VOICE "${CYBERPUNK_AUTO_VOICE:-0}" ;;
     9)
       read -r -p 'New greeting (empty cancels): ' greeting || exit 0
       if [ -n "$greeting" ]; then
