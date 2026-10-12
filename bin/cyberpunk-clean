@@ -1,0 +1,59 @@
+#!/data/data/com.termux/files/usr/bin/bash
+set -euo pipefail
+CONFIG="$HOME/.config/termux-cyberpunk/config"
+DATA="$HOME/.local/share/termux-cyberpunk"
+REPO_FILE="$DATA/repo-path"
+REPO_DIR=''
+[ ! -f "$REPO_FILE" ] || REPO_DIR="$(cat "$REPO_FILE")"
+ACTION="\${1:-menu}"
+case "$ACTION" in
+  settings)
+    mkdir -p "$(dirname "$CONFIG")"
+    [ ! -f "$CONFIG" ] || cp -p "$CONFIG" "$CONFIG.backup-$(date +%Y%m%d-%H%M%S)"
+    cat > "$CONFIG" <<'CFG'
+CYBERPUNK_ANIMATION=1
+CYBERPUNK_LOADING=1
+CYBERPUNK_AUTO_START=1
+CYBERPUNK_AUTO_VOICE=0
+CYBERPUNK_VOICE_STYLE=cinematic
+CYBERPUNK_VOICE_PITCH=0.82
+CYBERPUNK_VOICE_RATE=0.90
+CYBERPUNK_VOICE_GREETING="Good evening. All systems are online. How may I assist you?"
+CFG
+    echo "Settings reset to clean defaults. Previous settings were backed up."
+    ;;
+  themes)
+    echo "This removes only Termux Cyberpunk's cached theme presets, not themes from Android or other apps."
+    if [ -d "$DATA/themes" ]; then
+      mkdir -p "$DATA/theme-backups"
+      cp -a "$DATA/themes" "$DATA/theme-backups/themes-before-clean-$(date +%Y%m%d-%H%M%S)"
+      rm -f "$DATA"/themes/*.properties
+    fi
+    if [ -n "$REPO_DIR" ] && [ -d "$REPO_DIR/config/themes" ]; then
+      mkdir -p "$DATA/themes"
+      cp "$REPO_DIR"/config/themes/*.properties "$DATA/themes/"
+      echo "Installed theme cache refreshed from the current repository."
+    else
+      echo "Cached presets removed. Run cyberpunk-update or bash install.sh to install current presets."
+    fi
+    ;;
+  fresh)
+    echo "Fresh install will reset Cyberpunk settings and refresh its own installed files."
+    echo "It will NOT remove unrelated Android/Termux themes, apps, or your personal files."
+    read -r -p 'Continue? Type FRESH to confirm: ' confirm
+    [ "$confirm" = FRESH ] || { echo "Cancelled."; exit 0; }
+    "$0" settings
+    if [ -n "$REPO_DIR" ] && [ -f "$REPO_DIR/install.sh" ]; then
+      bash "$REPO_DIR/install.sh"
+    else
+      echo "Repository checkout not found. From the cloned repository, run: bash install.sh" >&2
+      exit 1
+    fi
+    ;;
+  *)
+    echo "Usage: cyberpunk-clean {settings|themes|fresh}"
+    echo " settings : back up and reset Cyberpunk settings"
+    echo " themes   : back up and refresh Cyberpunk's cached presets"
+    echo " fresh    : reset settings and rerun installer (confirmation required)"
+    ;;
+esac
