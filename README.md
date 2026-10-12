@@ -68,7 +68,7 @@ CYBERPUNK_VOICE_GREETING="Cyberpunk terminal online. Systems ready."
 - Restore removes only the marked Cyberpunk block from \`.bashrc\`; unrelated shell edits are preserved.
 - If a property file differs from the theme-installed snapshot, restore preserves it instead of overwriting user edits.
 - Backups and settings are retained under \`~/.local/share/termux-cyberpunk/\` and \`~/.config/termux-cyberpunk/\`.
-- Repeated installs create new timestamped backups. Keep the backup directory if you may want to recover older configurations.
+- The first known pre-theme state is retained in `~/.local/share/termux-cyberpunk/backups/original`; later installs refresh its installed-file snapshots without replacing that original baseline. Each install also creates a timestamped snapshot. Keep the backup directory if you may want to recover older configurations.
 
 ## Testing
 
