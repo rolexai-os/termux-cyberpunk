@@ -2,7 +2,7 @@
 set -euo pipefail
 FONT="$HOME/.termux/font.ttf"
 BACKUP_DIR="$HOME/.local/share/termux-cyberpunk/font-backups"
-ACTION="\${1:-list}"
+ACTION="${1:-list}"
 case "$ACTION" in
   list|--list)
     echo "Termux font manager"
@@ -15,7 +15,7 @@ case "$ACTION" in
     echo "Install the official Termux:Styling add-on, then long-press terminal > More > Style > Choose font."
     ;;
   install)
-    SOURCE="\${2:-}"
+    SOURCE="${2:-}"
     [ -n "$SOURCE" ] || { echo "Usage: cyberpunk-fonts install /path/to/font.ttf" >&2; exit 2; }
     [ -f "$SOURCE" ] || { echo "Font file not found: $SOURCE" >&2; exit 1; }
     case "$SOURCE" in *.ttf|*.TTF) ;; *) echo "Choose a .ttf TrueType font file." >&2; exit 2 ;; esac
