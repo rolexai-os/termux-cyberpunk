@@ -1,0 +1,17 @@
+#!/data/data/com.termux/files/usr/bin/bash
+set -euo pipefail
+STATE="$HOME/.local/share/termux-cyberpunk/repo-path"
+if [ -f "$STATE" ]; then
+  REPO_DIR="$(cat "$STATE")"
+elif [ -f "./install.sh" ] && [ -d "./.git" ]; then
+  REPO_DIR="$(pwd)"
+else
+  echo "Repository path not recorded. Run from the cloned termux-cyberpunk directory:" >&2
+  echo "  git pull --ff-only origin main && bash install.sh" >&2
+  exit 1
+fi
+[ -d "$REPO_DIR/.git" ] || { echo "Saved repository path is missing or not a Git checkout: $REPO_DIR" >&2; exit 1; }
+command -v git >/dev/null 2>&1 || { echo "Git is required. Run: pkg install git" >&2; exit 1; }
+echo "Updating Termux Cyberpunk in: $REPO_DIR"
+git -C "$REPO_DIR" pull --ff-only origin main
+bash "$REPO_DIR/install.sh"
