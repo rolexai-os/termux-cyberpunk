@@ -26,5 +26,5 @@ restore_config() {
 }
 restore_config ".termux/colors.properties" "colors.properties" "$HOME/.termux/colors.properties" "colors.properties"
 restore_config ".termux/termux.properties" "termux.properties" "$HOME/.termux/termux.properties" "termux.properties"
-rm -f "$HOME/.local/bin/cyberpunk" "$HOME/.local/bin/cyberpunk-dashboard" "$HOME/.local/bin/cyberpunk-voice" "$HOME/.local/bin/cyberpunk-restore" "$HOME/.local/bin/cyberpunk-manager" "$HOME/.local/bin/cyberpunk-banner.sh" "$HOME/.local/bin/cyberpunk-dashboard.sh" "$HOME/.local/bin/cyberpunk-voice.sh" "$HOME/.local/bin/cyberpunk-style" "$HOME/.local/bin/cyberpunk-art" "$HOME/.local/bin/cyberpunk-fonts" "$HOME/.local/bin/cyberpunk-update"
+rm -f "$HOME/.local/bin/cyberpunk" "$HOME/.local/bin/cyberpunk-dashboard" "$HOME/.local/bin/cyberpunk-voice" "$HOME/.local/bin/cyberpunk-restore" "$HOME/.local/bin/cyberpunk-manager" "$HOME/.local/bin/cyberpunk-banner.sh" "$HOME/.local/bin/cyberpunk-dashboard.sh" "$HOME/.local/bin/cyberpunk-voice.sh" "$HOME/.local/bin/cyberpunk-style" "$HOME/.local/bin/cyberpunk-art" "$HOME/.local/bin/cyberpunk-fonts" "$HOME/.local/bin/cyberpunk-update" "$HOME/.local/bin/cyberpunk-loader" "$HOME/.local/bin/cyberpunk-clean"
 echo "Restore complete. Restart Termux. Original backup history and user settings were retained."
