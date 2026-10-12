@@ -4,14 +4,19 @@ CONFIG="$HOME/.config/termux-cyberpunk/config"
 mkdir -p "$(dirname "$CONFIG")"
 [ -f "$CONFIG" ] || cat > "$CONFIG" <<'CFG'
 CYBERPUNK_ANIMATION=1
+CYBERPUNK_LOADING=1
+CYBERPUNK_AUTO_START=1
 CYBERPUNK_AUTO_VOICE=0
-CYBERPUNK_VOICE_GREETING="Cyberpunk terminal online. Systems ready."
+CYBERPUNK_VOICE_STYLE=cinematic
+CYBERPUNK_VOICE_PITCH=0.82
+CYBERPUNK_VOICE_RATE=0.90
+CYBERPUNK_VOICE_GREETING="Good evening. All systems are online. How may I assist you?"
 CFG
 load_config() { . "$CONFIG"; }
 set_config() {
   local key="$1" value="$2" tmp
-  tmp="$(mktemp "${CONFIG}.XXXXXX")" || return 1
-  if grep -qE "^[[:space:]]*${key}=" "$CONFIG"; then
+  tmp="$(mktemp "\${CONFIG}.XXXXXX")" || return 1
+  if grep -qE "^[[:space:]]*\${key}=" "$CONFIG"; then
     awk -v key="$key" -v value="$value" 'index($0,key "=")==1 {print key "=" value; next} {print}' "$CONFIG" > "$tmp"
   else
     cat "$CONFIG" > "$tmp"
@@ -20,37 +25,64 @@ set_config() {
   cat "$tmp" > "$CONFIG"
   rm -f "$tmp"
 }
+toggle() {
+  local key="$1" current="$2"
+  if [ "$current" = 1 ]; then set_config "$key" 0; echo "$key disabled."
+  else set_config "$key" 1; echo "$key enabled."; fi
+}
 while true; do
   load_config
-  printf '\n\033[1;36m=== CYBERPUNK THEME MANAGER ===\033[0m\n'
-  printf '1) Show banner + dashboard\n2) Refresh dashboard\n3) Test voice greeting\n4) Toggle startup animation (now: %s)\n5) Toggle automatic voice (now: %s)\n6) Change voice greeting\n7) Choose terminal color theme\n8) Banner / FIGlet styles\n9) Font collection manager\n10) Update from GitHub\n11) Restore/uninstall\n0) Exit\n' "${CYBERPUNK_ANIMATION:-1}" "${CYBERPUNK_AUTO_VOICE:-0}"
+  printf '\n\033[1;36m╔══════════════════════════════════════╗\033[0m\n'
+  printf '\033[1;36m║       CYBERPUNK CONTROL CENTER       ║\033[0m\n'
+  printf '\033[1;36m╚══════════════════════════════════════╝\033[0m\n'
+  printf '1) Launch terminal dashboard\n2) Refresh system dashboard\n3) Test assistant voice\n4) Voice profile: %s\n5) Auto-start banner: %s\n6) Digital loading animation: %s\n7) Banner animation: %s\n8) Automatic voice: %s\n9) Change greeting\n10) Choose color theme\n11) Banner / FIGlet styles\n12) Font manager\n13) Clean settings / fresh install\n14) Update from GitHub\n15) Restore / uninstall\n0) Exit\n' "\${CYBERPUNK_VOICE_STYLE:-cinematic}" "\${CYBERPUNK_AUTO_START:-1}" "\${CYBERPUNK_LOADING:-1}" "\${CYBERPUNK_ANIMATION:-1}" "\${CYBERPUNK_AUTO_VOICE:-0}"
   read -r -p 'Select: ' choice || exit 0
   case "$choice" in
     1) "$HOME/.local/bin/cyberpunk" ;;
     2) "$HOME/.local/bin/cyberpunk-dashboard" ;;
     3) "$HOME/.local/bin/cyberpunk-voice" ;;
-    4) if [ "${CYBERPUNK_ANIMATION:-1}" = 1 ]; then set_config CYBERPUNK_ANIMATION 0; else set_config CYBERPUNK_ANIMATION 1; fi; echo "Saved." ;;
-    5) if [ "${CYBERPUNK_AUTO_VOICE:-0}" = 1 ]; then set_config CYBERPUNK_AUTO_VOICE 0; else set_config CYBERPUNK_AUTO_VOICE 1; fi; echo "Saved." ;;
-    6)
-      read -r -p 'Enter greeting (empty cancels): ' greeting || exit 0
+    4)
+      echo "1) Cinematic AI (lower pitch, slower)  2) Balanced  3) Crisp"
+      read -r -p 'Choose profile: ' profile || exit 0
+      case "$profile" in
+        1) set_config CYBERPUNK_VOICE_STYLE cinematic; set_config CYBERPUNK_VOICE_PITCH 0.82; set_config CYBERPUNK_VOICE_RATE 0.90 ;;
+        2) set_config CYBERPUNK_VOICE_STYLE balanced; set_config CYBERPUNK_VOICE_PITCH 0.96; set_config CYBERPUNK_VOICE_RATE 1.00 ;;
+        3) set_config CYBERPUNK_VOICE_STYLE crisp; set_config CYBERPUNK_VOICE_PITCH 0.92; set_config CYBERPUNK_VOICE_RATE 1.08 ;;
+        *) echo "Cancelled." ;;
+      esac ;;
+    5) toggle CYBERPUNK_AUTO_START "\${CYBERPUNK_AUTO_START:-1}" ;;
+    6) toggle CYBERPUNK_LOADING "\${CYBERPUNK_LOADING:-1}" ;;
+    7) toggle CYBERPUNK_ANIMATION "\${CYBERPUNK_ANIMATION:-1}" ;;
+    8) toggle CYBERPUNK_AUTO_VOICE "\${CYBERPUNK_AUTO_VOICE:-0}" ;;
+    9)
+      read -r -p 'New greeting (empty cancels): ' greeting || exit 0
       if [ -n "$greeting" ]; then
         escaped="$(printf '%s' "$greeting" | sed 's/\\/\\\\/g; s/"/\\"/g')"
         set_config CYBERPUNK_VOICE_GREETING "\"$escaped\""
         echo "Greeting saved."
       fi ;;
-    7)
+    10)
       "$HOME/.local/bin/cyberpunk-style" --list
       read -r -p 'Theme name (empty cancels): ' theme || exit 0
       [ -z "$theme" ] || "$HOME/.local/bin/cyberpunk-style" "$theme" ;;
-    8)
+    11)
       "$HOME/.local/bin/cyberpunk-art" --list
-      read -r -p 'Banner style (cyberpunk/matrix/compact/figlet/toilet/rainbow): ' art_style || exit 0
-      read -r -p 'Text to render (empty uses CYBERPUNK): ' art_text || exit 0
+      read -r -p 'Banner style: ' art_style || exit 0
+      read -r -p 'Text (empty uses CYBERPUNK): ' art_text || exit 0
       [ -n "$art_text" ] || art_text=CYBERPUNK
       "$HOME/.local/bin/cyberpunk-art" "$art_style" "$art_text" ;;
-    9) "$HOME/.local/bin/cyberpunk-fonts" list ;;
-    10) read -r -p 'Update repository and reinstall? [y/N] ' confirm || exit 0; case "$confirm" in y|Y|yes|YES) "$HOME/.local/bin/cyberpunk-update" ;; *) echo "Cancelled." ;; esac ;;
-    11) read -r -p 'Restore/uninstall theme? [y/N] ' confirm || exit 0; case "$confirm" in y|Y|yes|YES) "$HOME/.local/bin/cyberpunk-restore"; exit $? ;; *) echo "Cancelled." ;; esac ;;
+    12) "$HOME/.local/bin/cyberpunk-fonts" list ;;
+    13)
+      echo "1) Reset settings  2) Refresh cached themes  3) Fresh reinstall"
+      read -r -p 'Choose action: ' clean_action || exit 0
+      case "$clean_action" in
+        1) "$HOME/.local/bin/cyberpunk-clean" settings ;;
+        2) "$HOME/.local/bin/cyberpunk-clean" themes ;;
+        3) "$HOME/.local/bin/cyberpunk-clean" fresh ;;
+        *) echo "Cancelled." ;;
+      esac ;;
+    14) read -r -p 'Update from GitHub and reinstall? [y/N] ' confirm || exit 0; case "$confirm" in y|Y|yes|YES) "$HOME/.local/bin/cyberpunk-update" ;; *) echo "Cancelled." ;; esac ;;
+    15) read -r -p 'Restore/uninstall? [y/N] ' confirm || exit 0; case "$confirm" in y|Y|yes|YES) "$HOME/.local/bin/cyberpunk-restore"; exit $? ;; *) echo "Cancelled." ;; esac ;;
     0|q|Q) exit 0 ;;
     *) echo "Choose a listed option." ;;
   esac
