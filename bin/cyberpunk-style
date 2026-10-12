@@ -3,7 +3,7 @@ set -euo pipefail
 THEME_DIR="$HOME/.local/share/termux-cyberpunk/themes"
 BACKUP_DIR="$HOME/.local/share/termux-cyberpunk/theme-backups"
 COLORS="$HOME/.termux/colors.properties"
-THEME="\${1:-}"
+THEME="${1:-}"
 if [ -z "$THEME" ] || [ "$THEME" = "--list" ] || [ "$THEME" = "list" ]; then
   echo "Available themes:"
   for f in "$THEME_DIR"/*.properties; do [ -f "$f" ] && printf '  %s\n' "$(basename "$f" .properties)"; done
