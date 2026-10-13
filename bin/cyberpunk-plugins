@@ -1,0 +1,21 @@
+#!/data/data/com.termux/files/usr/bin/bash
+set -euo pipefail
+ROOT="$HOME/.local/share/termux-cyberpunk/plugins"
+mkdir -p "$ROOT"
+ACTION="$1"; [ -n "$ACTION" ] || ACTION=list
+valid_name() { [[ "$1" =~ ^[a-zA-Z0-9][a-zA-Z0-9_-]{0,39}$ ]]; }
+case "$ACTION" in
+ list) echo "Local plugins:"; found=0; for f in "$ROOT"/*.sh; do [ -f "$f" ] || continue; found=1; printf '  %s\n' "$(basename "$f" .sh)"; done; [ "$found" = 1 ] || echo "  (none yet; use cyberpunk-plugins create NAME)" ;;
+ create) name="$2"; valid_name "$name" || { echo "Usage: cyberpunk-plugins create NAME" >&2; exit 2; }; target="$ROOT/$name.sh"; [ ! -e "$target" ] || { echo "Already exists: $name" >&2; exit 1; }; cat > "$target" <<'PLUGIN'
+#!/data/data/com.termux/files/usr/bin/bash
+set -euo pipefail
+echo "Hello from your Cyberpunk plugin."
+# Add your own reviewed commands below.
+PLUGIN
+ chmod 700 "$target"; echo "Created starter plugin: $target" ;;
+ install) source_file="$2"; [ -n "$source_file" ] && [ -f "$source_file" ] || { echo "Usage: cyberpunk-plugins install /path/to/plugin.sh" >&2; exit 2; }; name="$(basename "$source_file" .sh)"; valid_name "$name" || { echo "Invalid plugin filename." >&2; exit 2; }; target="$ROOT/$name.sh"; [ ! -e "$target" ] || { echo "Already exists: $name" >&2; exit 1; }; bash -n "$source_file" || { echo "Bash syntax error; not installed." >&2; exit 1; }; echo "Plugins execute as your Termux user. Review the source before installing."; read -r -p 'Install this local plugin? [y/N] ' confirm; case "$confirm" in y|Y|yes|YES) cp "$source_file" "$target"; chmod 700 "$target"; echo "Installed: $name" ;; *) echo "Cancelled." ;; esac ;;
+ run) name="$2"; valid_name "$name" || { echo "Usage: cyberpunk-plugins run NAME [args...]" >&2; exit 2; }; target="$ROOT/$name.sh"; [ -f "$target" ] || { echo "Unknown plugin: $name" >&2; exit 1; }; bash -n "$target"; shift 2; bash "$target" "$@" ;;
+ remove) name="$2"; valid_name "$name" || { echo "Usage: cyberpunk-plugins remove NAME" >&2; exit 2; }; target="$ROOT/$name.sh"; [ -f "$target" ] || { echo "Unknown plugin: $name" >&2; exit 1; }; read -r -p "Delete plugin '$name'? [y/N] " confirm; case "$confirm" in y|Y|yes|YES) rm -- "$target"; echo "Removed: $name" ;; *) echo "Cancelled." ;; esac ;;
+ -h|--help|help) echo "Usage: cyberpunk-plugins {list|create NAME|install FILE|run NAME|remove NAME}" ;;
+ *) echo "Usage: cyberpunk-plugins {list|create NAME|install FILE|run NAME|remove NAME}" >&2; exit 2 ;;
+esac
