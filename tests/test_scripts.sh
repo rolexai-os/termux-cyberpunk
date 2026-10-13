@@ -23,6 +23,9 @@ grep -q 'cyberpunk-fonts' install.sh || fail "font manager installation"
 grep -q 'cyberpunk-update' install.sh || fail "updater installation"
 grep -q 'MARK_START' bin/cyberpunk-restore || fail "managed .bashrc block restore"
 grep -q -- '--watch' bin/cyberpunk-dashboard.sh || fail "dashboard watch mode"
+grep -q 'CYBERPUNK_STARTUP_COMMAND' bin/cyberpunk || fail "custom startup command support"
+grep -q 'Set startup command/app' bin/cyberpunk-manager || fail "startup command manager menu"
+if grep -qE 'Storage|Battery|termux-battery-status|df -h' bin/cyberpunk-dashboard.sh; then fail "dashboard should omit storage and battery details"; fi
 for theme in cyberpunk.properties matrix.properties dracula.properties nord.properties gruvbox.properties solarized-dark.properties monokai.properties synthwave.properties; do
   [ -s "config/themes/$theme" ] || fail "missing theme: $theme"
   grep -q '^background=#' "config/themes/$theme" || fail "theme background: $theme"
