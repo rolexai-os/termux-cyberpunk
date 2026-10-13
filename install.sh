@@ -1,7 +1,7 @@
 #!/data/data/com.termux/files/usr/bin/bash
 set -euo pipefail
 ROOT="$(cd "$(dirname "$0")" && pwd)"
-for required in config/colors.properties config/termux.properties bin/cyberpunk bin/cyberpunk-banner.sh bin/cyberpunk-dashboard.sh bin/cyberpunk-voice.sh bin/cyberpunk-manager bin/cyberpunk-restore bin/cyberpunk-loader bin/cyberpunk-clean bin/cyberpunk-style bin/cyberpunk-art bin/cyberpunk-fonts bin/cyberpunk-update; do
+for required in config/colors.properties config/termux.properties bin/cyberpunk bin/cyberpunk-banner.sh bin/cyberpunk-dashboard.sh bin/cyberpunk-voice.sh bin/cyberpunk-manager bin/cyberpunk-restore bin/cyberpunk-loader bin/cyberpunk-clean bin/cyberpunk-style bin/cyberpunk-art bin/cyberpunk-fonts bin/cyberpunk-update bin/cyberpunk-plugins bin/cyberpunk-backup bin/cyberpunk-listen bin/cyberpunk-monitor; do
   [ -f "$ROOT/$required" ] || { echo "Missing project file: $required" >&2; exit 1; }
 done
 [ -d "$ROOT/config/themes" ] || { echo "Missing theme collection: config/themes" >&2; exit 1; }
@@ -38,7 +38,7 @@ if [ -f "$BASELINE/installed/colors.properties" ] && [ -f "$HOME/.termux/colors.
 if [ -f "$BASELINE/installed/termux.properties" ] && [ -f "$HOME/.termux/termux.properties" ] && ! cmp -s "$HOME/.termux/termux.properties" "$BASELINE/installed/termux.properties"; then PRESERVE_PROPERTIES=1; fi
 if [ "$PRESERVE_COLORS" = 0 ]; then cp "$ROOT/config/colors.properties" "$HOME/.termux/colors.properties"; else echo "Preserving customized terminal colors."; fi
 if [ "$PRESERVE_PROPERTIES" = 0 ]; then cp "$ROOT/config/termux.properties" "$HOME/.termux/termux.properties"; else echo "Preserving customized Termux properties."; fi
-for file in cyberpunk cyberpunk-banner.sh cyberpunk-dashboard.sh cyberpunk-voice.sh cyberpunk-dashboard cyberpunk-voice cyberpunk-manager cyberpunk-restore cyberpunk-loader cyberpunk-clean cyberpunk-style cyberpunk-art cyberpunk-fonts cyberpunk-update; do cp "$ROOT/bin/$file" "$HOME/.local/bin/$file"; done
+for file in cyberpunk cyberpunk-banner.sh cyberpunk-dashboard.sh cyberpunk-voice.sh cyberpunk-dashboard cyberpunk-voice cyberpunk-manager cyberpunk-restore cyberpunk-loader cyberpunk-clean cyberpunk-style cyberpunk-art cyberpunk-fonts cyberpunk-update cyberpunk-plugins cyberpunk-backup cyberpunk-listen cyberpunk-monitor; do cp "$ROOT/bin/$file" "$HOME/.local/bin/$file"; done
 THEME_HOME="$HOME/.local/share/termux-cyberpunk/themes"
 mkdir -p "$THEME_HOME"
 cp "$ROOT"/config/themes/*.properties "$THEME_HOME/"
@@ -85,6 +85,6 @@ echo
 echo "Cyberpunk theme installed."
 echo "Backup: $BACKUP"
 echo "Original baseline: $BASELINE"
-echo "Commands: cyberpunk, cyberpunk-manager, cyberpunk-style --list, cyberpunk-art --list, cyberpunk-fonts, cyberpunk-update, cyberpunk-dashboard --watch [seconds], cyberpunk-voice, cyberpunk-restore"
+echo "Commands: cyberpunk, cyberpunk-manager, cyberpunk-style --list, cyberpunk-art --list, cyberpunk-fonts, cyberpunk-update, cyberpunk-dashboard --watch [seconds], cyberpunk-monitor --watch [seconds], cyberpunk-voice, cyberpunk-listen, cyberpunk-plugins, cyberpunk-backup, cyberpunk-restore"
 echo "Optional voice: install the matching Termux:API Android app, then run: pkg install termux-api"
 echo "Termux appearance changes take effect after restarting the session."
