@@ -9,7 +9,7 @@ A lightweight, reversible terminal customization toolkit for Termux on Android 1
 - Banner styles: built-in Cyberpunk, Matrix, compact, FIGlet, TOIlet and optional rainbow output with lolcat
 - Font manager for local TrueType fonts, with backup, restore and reset commands
 - Font-family collection guide for JetBrains Mono, Fira Code, Hack, Ubuntu Mono, Source Code Pro, Iosevka and MesloLGS NF
-- Device, Android version, date/time, uptime, memory, storage, and optional battery dashboard
+- Device, Android version, date/time, uptime and memory dashboard (storage and battery panels intentionally omitted)
 - Cinematic AI-assistant voice profile with adjustable Android TTS pitch and rate (voice timbre depends on the installed Android TTS engine)
 - Animated digital boot/loading screen and automatic banner/dashboard on interactive shell startup
 - Clean settings manager with safe settings reset, theme-cache refresh and confirmed fresh reinstall
@@ -78,6 +78,7 @@ cyberpunk-fonts reset             # Remove custom font; use Termux default
 cyberpunk-update                  # Pull latest main and reinstall
 cyberpunk-dashboard               # One-shot system dashboard
 cyberpunk-dashboard --watch 10    # Refresh every 10 seconds
+cyberpunk-manager                 # Customize voice, theme, startup and more
 cyberpunk-voice                   # Speak configured cinematic AI greeting
 cyberpunk-restore                 # Restore theme configuration and uninstall commands
 ```
@@ -116,6 +117,10 @@ Termux uses a custom font file at `~/.termux/font.ttf`. `cyberpunk-fonts install
 
 For a curated font collection, install the official [Termux:Styling add-on](https://github.com/termux/termux-styling), then long-press the terminal, choose **More → Style → Choose font**. Explore JetBrains Mono, Fira Code, Hack, Ubuntu Mono, Source Code Pro, Iosevka and MesloLGS NF when offered by your chosen font source. Verify licensing and download fonts only from trusted sources. After manually installing a font, restart Termux.
 
+## Custom startup command
+
+Use `cyberpunk-manager` and select **16) Set startup command/app** to run a command after the banner and dashboard when Termux starts. Examples include `htop`, `python`, or `cd ~/project && python app.py`. Leave the prompt empty to disable it. Startup commands run with your Termux user permissions, so only configure commands you trust.
+
 ## Settings
 
 Edit `~/.config/termux-cyberpunk/config`:
@@ -137,11 +142,12 @@ CYBERPUNK_VOICE_GREETING="Good evening. All systems are online. How may I assist
 - `CYBERPUNK_AUTO_VOICE=1` speaks the greeting on each `cyberpunk` command invocation.
 - `CYBERPUNK_VOICE_STYLE` accepts `cinematic`, `balanced` or `crisp`; pitch and rate can also be adjusted.
 - `CYBERPUNK_VOICE_GREETING` sets the text passed to Android text-to-speech.
+- `CYBERPUNK_STARTUP_COMMAND` can run a command/app after the startup display; configure it in `cyberpunk-manager` (option 16). Only use commands you trust.
 - Use `cyberpunk-manager` to change settings without manually editing the config.
 
 ### Cinematic assistant voice
 
-The `cinematic` profile requests a lower pitch and slower delivery from Android TTS. This creates an original, polished futuristic-assistant style; it does not clone Tony Stark, Robert Downey Jr., or any actor's voice. The actual timbre depends on the voice and engine selected in Android **Settings → Text-to-speech output**. Install Termux:API from the same source/signing family as Termux, then run `pkg install termux-api`. Test with `cyberpunk-voice` or select a profile in `cyberpunk-manager`.
+The `cinematic` profile requests a lower pitch and slower delivery from Android TTS for an original futuristic-assistant sound; it does not clone Tony Stark, Robert Downey Jr., or any actor's voice. For a masculine voice, open Android **Settings → Text-to-speech output**, select an available male voice in your TTS engine, then install Termux:API from the same source/signing family as Termux and run `pkg install termux-api`. Test with `cyberpunk-voice`; use `cyberpunk-manager` option 17 for the setup tips. The available voices depend on the Android TTS engine and language packs.
 
 ### Clean settings and fresh install
 
@@ -176,7 +182,6 @@ The test suite checks Bash syntax and static feature markers without requiring A
 - **FIGlet/TOIlet command missing:** run `pkg install figlet toilet`; built-in art still works without these tools.
 - **Font file cannot be found:** move the downloaded `.ttf` into Termux-accessible storage and pass its actual path to `cyberpunk-fonts install`.
 - **Voice is unavailable:** install the Termux:API app from the same source as Termux, run `pkg install termux-api`, and verify an Android TTS engine is enabled.
-- **Battery details are missing:** grant Termux:API permissions if requested; the rest of the dashboard remains usable.
 - **Restore preserves a file:** this is intentional when the file changed after installation. Review it manually before replacing it with a backup.
 
 ## Uninstall
