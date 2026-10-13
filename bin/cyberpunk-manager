@@ -11,6 +11,7 @@ CYBERPUNK_VOICE_STYLE=cinematic
 CYBERPUNK_VOICE_PITCH=0.82
 CYBERPUNK_VOICE_RATE=0.90
 CYBERPUNK_VOICE_GREETING="Good evening. All systems are online. How may I assist you?"
+CYBERPUNK_STARTUP_COMMAND=''
 CFG
 load_config() { . "$CONFIG"; }
 set_config() {
@@ -35,14 +36,14 @@ while true; do
   printf '\n\033[1;36m╔══════════════════════════════════════╗\033[0m\n'
   printf '\033[1;36m║       CYBERPUNK CONTROL CENTER       ║\033[0m\n'
   printf '\033[1;36m╚══════════════════════════════════════╝\033[0m\n'
-  printf '1) Launch terminal dashboard\n2) Refresh system dashboard\n3) Test assistant voice\n4) Voice profile: %s\n5) Auto-start banner: %s\n6) Digital loading animation: %s\n7) Banner animation: %s\n8) Automatic voice: %s\n9) Change greeting\n10) Choose color theme\n11) Banner / FIGlet styles\n12) Font manager\n13) Clean settings / fresh install\n14) Update from GitHub\n15) Restore / uninstall\n0) Exit\n' "${CYBERPUNK_VOICE_STYLE:-cinematic}" "${CYBERPUNK_AUTO_START:-1}" "${CYBERPUNK_LOADING:-1}" "${CYBERPUNK_ANIMATION:-1}" "${CYBERPUNK_AUTO_VOICE:-0}"
+  printf '1) Launch terminal dashboard\n2) Refresh system dashboard\n3) Test assistant voice\n4) Voice profile: %s\n5) Auto-start banner: %s\n6) Digital loading animation: %s\n7) Banner animation: %s\n8) Automatic voice: %s\n9) Change greeting\n10) Choose color theme\n11) Banner / FIGlet styles\n12) Font manager\n13) Clean settings / fresh install\n14) Update from GitHub\n15) Restore / uninstall\n16) Set startup command/app\n17) Voice setup tips\n0) Exit\n' "${CYBERPUNK_VOICE_STYLE:-cinematic}" "${CYBERPUNK_AUTO_START:-1}" "${CYBERPUNK_LOADING:-1}" "${CYBERPUNK_ANIMATION:-1}" "${CYBERPUNK_AUTO_VOICE:-0}"
   read -r -p 'Select: ' choice || exit 0
   case "$choice" in
     1) "$HOME/.local/bin/cyberpunk" ;;
     2) "$HOME/.local/bin/cyberpunk-dashboard" ;;
     3) "$HOME/.local/bin/cyberpunk-voice" ;;
     4)
-      echo "1) Cinematic AI (lower pitch, slower)  2) Balanced  3) Crisp"
+      echo "1) Cinematic assistant (lower pitch, slower)  2) Balanced  3) Crisp"
       read -r -p 'Choose profile: ' profile || exit 0
       case "$profile" in
         1) set_config CYBERPUNK_VOICE_STYLE cinematic; set_config CYBERPUNK_VOICE_PITCH 0.82; set_config CYBERPUNK_VOICE_RATE 0.90 ;;
@@ -83,6 +84,24 @@ while true; do
       esac ;;
     14) read -r -p 'Update from GitHub and reinstall? [y/N] ' confirm || exit 0; case "$confirm" in y|Y|yes|YES) "$HOME/.local/bin/cyberpunk-update" ;; *) echo "Cancelled." ;; esac ;;
     15) read -r -p 'Restore/uninstall? [y/N] ' confirm || exit 0; case "$confirm" in y|Y|yes|YES) "$HOME/.local/bin/cyberpunk-restore"; exit $? ;; *) echo "Cancelled." ;; esac ;;
+    16)
+      echo "Enter a command or app to run after the banner/dashboard (example: neofetch, htop, python, or cd ~/project && python app.py)."
+      echo "Leave empty to disable. Only enter commands you trust; this runs in your shell at startup."
+      read -r -p 'Startup command: ' startup_command || exit 0
+      if [ -z "$startup_command" ]; then
+        set_config CYBERPUNK_STARTUP_COMMAND "''"
+        echo "Startup command disabled."
+      else
+        escaped="$(printf '%s' "$startup_command" | sed "s/'/'\\\\''/g")"
+        set_config CYBERPUNK_STARTUP_COMMAND "'$escaped'"
+        echo "Startup command saved. It will run after the dashboard when Cyberpunk starts."
+      fi ;;
+    17)
+      echo "For a male assistant-style voice, open Android Settings > Text-to-speech output."
+      echo "Choose a TTS engine and select an available male voice/English voice variant."
+      echo "Then run: cyberpunk-voice"
+      echo "The cinematic profile requests lower pitch/slower speech; exact timbre depends on your TTS engine."
+      echo "It does not clone Tony Stark or Robert Downey Jr.'s voice." ;;
     0|q|Q) exit 0 ;;
     *) echo "Choose a listed option." ;;
   esac
