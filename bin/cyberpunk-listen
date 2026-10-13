@@ -7,8 +7,8 @@ heard="$(termux-speech-to-text 2>/dev/null || true)"
 command_text="$(printf '%s' "$heard" | tr '[:upper:]' '[:lower:]' | sed 's/^[[:space:]]*//; s/[[:space:]]*$//')"
 [ -n "$command_text" ] || { say "I did not hear a command."; exit 1; }
 case "$command_text" in
- *dashboard*|*system status*) say "Opening system dashboard."; exec "$HOME/.local/bin/cyberpunk-dashboard" ;;
- *monitor*|*live status*) say "Opening live system monitor."; exec "$HOME/.local/bin/cyberpunk-monitor" --watch 3 ;;
+ *dashboard*|*"system status"*) say "Opening system dashboard."; exec "$HOME/.local/bin/cyberpunk-dashboard" ;;
+ *monitor*|*"live status"*) say "Opening live system monitor."; exec "$HOME/.local/bin/cyberpunk-monitor" --watch 3 ;;
  *theme*|*appearance*) say "Opening theme list."; exec "$HOME/.local/bin/cyberpunk-style" --list ;;
  *settings*|*manager*) say "Opening Cyberpunk control center."; exec "$HOME/.local/bin/cyberpunk-manager" ;;
  *voice*|*speak*) say "Testing assistant voice."; exec "$HOME/.local/bin/cyberpunk-voice" ;;
