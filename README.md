@@ -4,7 +4,7 @@ A lightweight, reversible terminal customization toolkit for Termux on Android 1
 
 ## Features
 
-- Cyberpunk neon palette plus seven selectable presets: Matrix, Dracula, Nord, Gruvbox, Solarized Dark, Monokai and Synthwave
+- Cyberpunk neon palette plus thirteen selectable presets: Matrix, Dracula, Nord, Gruvbox, Solarized Dark, Monokai, Synthwave, Ocean, Amber, Bloodmoon, Forest, Arctic and Vaporwave
 - Safe theme switching with timestamped backups of your previous palette
 - Banner styles: built-in Cyberpunk, Matrix, compact, FIGlet, TOIlet and optional rainbow output with lolcat
 - Font manager for local TrueType fonts, with backup, restore and reset commands
@@ -16,6 +16,10 @@ A lightweight, reversible terminal customization toolkit for Termux on Android 1
 - Interactive manager and one-command GitHub updater
 - Backup-aware installer and conservative restore/uninstall
 - Dashboard refresh mode: `cyberpunk-dashboard --watch [seconds]`
+- Live monitor for load, memory, top processes and network counters (storage/battery omitted)
+- Local plugin manager with create, install, run, list and remove commands
+- Manual settings backup and safe restore of Cyberpunk/Termux appearance files
+- Optional one-shot speech shortcuts using Termux:API; only predefined actions are accepted
 - Bash syntax checks and automated tests through GitHub Actions
 
 ## Requirements
@@ -78,6 +82,13 @@ cyberpunk-fonts reset             # Remove custom font; use Termux default
 cyberpunk-update                  # Pull latest main and reinstall
 cyberpunk-dashboard               # One-shot system dashboard
 cyberpunk-dashboard --watch 10    # Refresh every 10 seconds
+cyberpunk-monitor --watch 3       # Live system and network monitor
+cyberpunk-listen                  # One-shot spoken shortcuts (Termux:API required)
+cyberpunk-plugins list            # Manage local shell plugins
+cyberpunk-plugins create NAME     # Create a starter plugin
+cyberpunk-backup create           # Back up current settings
+cyberpunk-backup list             # List saved backups
+cyberpunk-backup restore latest   # Restore newest backup after confirmation
 cyberpunk-manager                 # Customize voice, theme, startup and more
 cyberpunk-voice                   # Speak configured cinematic AI greeting
 cyberpunk-restore                 # Restore theme configuration and uninstall commands
@@ -95,6 +106,12 @@ Presets are stored under `config/themes/` in the repository and copied to `~/.lo
 - `solarized-dark` — low-contrast dark palette
 - `monokai` — classic coding palette
 - `synthwave` — magenta/cyan retro neon
+- `ocean` — deep blue and cyan
+- `amber` — warm amber terminal
+- `bloodmoon` — crimson and rose
+- `forest` — green natural palette
+- `arctic` — cool blue and ice
+- `vaporwave` — pink, violet and cyan
 
 Every theme switch saves the previous `~/.termux/colors.properties` under `~/.local/share/termux-cyberpunk/theme-backups/`. Run `termux-reload-settings` when available; restart Termux if colors do not refresh.
 
@@ -197,3 +214,16 @@ It removes installed commands and the managed `.bashrc` block, and restores prop
 ## License
 
 MIT
+
+
+## Voice shortcuts
+
+Install the Termux:API Android app from the same source/signing family as Termux, then run `pkg install termux-api`. Use `cyberpunk-listen` and speak one shortcut such as dashboard, monitor, themes, settings, voice, plugins, backup, update or cancel. Recognition availability depends on Android speech services. The command router only maps speech to predefined actions; it does not execute arbitrary recognized text as shell code.
+
+## Plugins
+
+Use `cyberpunk-plugins create my-plugin` to create a starter under `~/.local/share/termux-cyberpunk/plugins/`. Review plugin code before running it: shell plugins execute with your Termux user's permissions. Install only scripts you trust.
+
+## Backups and restore
+
+`cyberpunk-backup create` saves the Cyberpunk config, Termux color palette, Termux properties and optional custom font under `~/.local/share/termux-cyberpunk/manual-backups/`. Restore asks for confirmation and first creates a safety backup of the current state. Upgrades continue to preserve the existing config and customized terminal properties where possible.
