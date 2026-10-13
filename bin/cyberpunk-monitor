@@ -1,0 +1,17 @@
+#!/data/data/com.termux/files/usr/bin/bash
+set -u
+C=$'\033[1;36m'; G=$'\033[1;32m'; R=$'\033[0m'
+show() {
+ printf '%s\n' "$C╔════════════════ CYBERPUNK MONITOR ════════════════╗$R"
+ printf '%s\n' "$C Time:$R $(date '+%Y-%m-%d %H:%M:%S %Z' 2>/dev/null || echo unavailable)"
+ printf '%s\n' "$C Load:$R $(uptime 2>/dev/null | sed 's/.*load average[s]*: *//' || echo unavailable)"
+ printf '%s\n' "$C Memory:$R"; if command -v free >/dev/null 2>&1; then free -h | head -n 2; else echo "free unavailable (pkg install procps)"; fi
+ printf '%s\n' "$C Top processes:$R"; if command -v top >/dev/null 2>&1; then top -b -n 1 2>/dev/null | head -n 8 || top -n 1 2>/dev/null | head -n 8 || true; else echo "top unavailable (pkg install procps)"; fi
+ printf '%s\n' "$C Network counters (bytes received / sent):$R"
+ if [ -r /proc/net/dev ]; then awk -F'[: ]+' 'NR>2 {name=$2; rx=$3; tx=$11; if (name!="" && rx ~ /^[0-9]+$/ && tx ~ /^[0-9]+$/) printf "  %-12s %12s / %s\n", name, rx, tx}' /proc/net/dev; else echo "Network counters unavailable."; fi
+ printf '%s\n' "$G Storage and battery panels are intentionally omitted.$R"
+ printf '%s\n' "$C════════════════════════════════════════════════════$R"
+}
+ACTION="$1"; [ -n "$ACTION" ] || ACTION=show
+if [ "$ACTION" = "--watch" ] || [ "$ACTION" = "-w" ]; then interval="$2"; [ -n "$interval" ] || interval=3; case "$interval" in *[!0-9]*|"") echo "Usage: cyberpunk-monitor [--watch [seconds]]" >&2; exit 2 ;; esac; [ "$interval" -ge 2 ] || interval=2; while :; do clear 2>/dev/null || true; show; echo "Refreshing every $interval seconds; Ctrl+C to stop."; sleep "$interval"; done
+else show; fi
