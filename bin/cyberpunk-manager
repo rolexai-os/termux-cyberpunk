@@ -92,7 +92,7 @@ while true; do
         set_config CYBERPUNK_STARTUP_COMMAND_B64 "''"
         echo "Startup command disabled."
       else
-        encoded="$(printf '%s' "$startup_command" | base64 | tr -d '\\n')"
+        encoded="$(printf '%s' "$startup_command" | base64 | tr -d '\n')"
         set_config CYBERPUNK_STARTUP_COMMAND_B64 "$encoded"
         echo "Startup command saved. It will run after the dashboard when Cyberpunk starts."
       fi ;;
