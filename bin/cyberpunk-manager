@@ -11,7 +11,7 @@ CYBERPUNK_VOICE_STYLE=cinematic
 CYBERPUNK_VOICE_PITCH=0.82
 CYBERPUNK_VOICE_RATE=0.90
 CYBERPUNK_VOICE_GREETING="Good evening. All systems are online. How may I assist you?"
-CYBERPUNK_STARTUP_COMMAND=''
+CYBERPUNK_STARTUP_COMMAND_B64=''
 CFG
 load_config() { . "$CONFIG"; }
 set_config() {
@@ -89,11 +89,11 @@ while true; do
       echo "Leave empty to disable. Only enter commands you trust; this runs in your shell at startup."
       read -r -p 'Startup command: ' startup_command || exit 0
       if [ -z "$startup_command" ]; then
-        set_config CYBERPUNK_STARTUP_COMMAND "''"
+        set_config CYBERPUNK_STARTUP_COMMAND_B64 "''"
         echo "Startup command disabled."
       else
-        escaped="$(printf '%s' "$startup_command" | sed "s/'/'\\\\''/g")"
-        set_config CYBERPUNK_STARTUP_COMMAND "'$escaped'"
+        encoded="$(printf '%s' "$startup_command" | base64 | tr -d '\\n')"
+        set_config CYBERPUNK_STARTUP_COMMAND_B64 "$encoded"
         echo "Startup command saved. It will run after the dashboard when Cyberpunk starts."
       fi ;;
     17)
