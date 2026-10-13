@@ -2,11 +2,16 @@
 set -u
 CONFIG="$HOME/.config/termux-cyberpunk/config"
 [ -f "$CONFIG" ] && . "$CONFIG"
-if [ "\${CYBERPUNK_LOADING:-1}" = 1 ]; then
+if [ "${CYBERPUNK_LOADING:-1}" = 1 ]; then
   "$(dirname "$0")/cyberpunk-loader"
 fi
 "$(dirname "$0")/cyberpunk-banner.sh"
 "$(dirname "$0")/cyberpunk-dashboard.sh"
-if [ "\${CYBERPUNK_AUTO_VOICE:-0}" = 1 ]; then
+if [ "${CYBERPUNK_AUTO_VOICE:-0}" = 1 ]; then
   "$(dirname "$0")/cyberpunk-voice.sh" >/dev/null 2>&1 || true
+fi
+# Optional user-defined command/app to run after the startup display.
+if [ -n "${CYBERPUNK_STARTUP_COMMAND:-}" ]; then
+  printf '\033[1;36m[CYBERPUNK] Running your configured startup command...\033[0m\n'
+  eval "$CYBERPUNK_STARTUP_COMMAND"
 fi
