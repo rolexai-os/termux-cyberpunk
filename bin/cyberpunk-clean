@@ -19,6 +19,7 @@ CYBERPUNK_VOICE_STYLE=cinematic
 CYBERPUNK_VOICE_PITCH=0.82
 CYBERPUNK_VOICE_RATE=0.90
 CYBERPUNK_VOICE_GREETING="Good evening. All systems are online. How may I assist you?"
+CYBERPUNK_STARTUP_COMMAND=''
 CFG
     echo "Settings reset to clean defaults. Previous settings were backed up."
     ;;
@@ -67,7 +68,7 @@ CFG
   *)
     echo "Usage: cyberpunk-clean {settings|themes|fresh}"
     echo " settings : back up and reset Cyberpunk settings"
-    echo " themes   : back up and refresh Cyberpunk's cached presets"
+    echo " themes   : back up and refresh Cyberpunk's cached theme presets"
     echo " fresh    : reset settings and rerun installer (confirmation required)"
     ;;
 esac
