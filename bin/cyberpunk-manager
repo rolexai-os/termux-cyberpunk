@@ -36,7 +36,7 @@ while true; do
   printf '\n\033[1;36m╔══════════════════════════════════════╗\033[0m\n'
   printf '\033[1;36m║       CYBERPUNK CONTROL CENTER       ║\033[0m\n'
   printf '\033[1;36m╚══════════════════════════════════════╝\033[0m\n'
-  printf '1) Launch terminal dashboard\n2) Refresh system dashboard\n3) Test assistant voice\n4) Voice profile: %s\n5) Auto-start banner: %s\n6) Digital loading animation: %s\n7) Banner animation: %s\n8) Automatic voice: %s\n9) Change greeting\n10) Choose color theme\n11) Banner / FIGlet styles\n12) Font manager\n13) Clean settings / fresh install\n14) Update from GitHub\n15) Restore / uninstall\n16) Set startup command/app\n17) Voice setup tips\n0) Exit\n' "${CYBERPUNK_VOICE_STYLE:-cinematic}" "${CYBERPUNK_AUTO_START:-1}" "${CYBERPUNK_LOADING:-1}" "${CYBERPUNK_ANIMATION:-1}" "${CYBERPUNK_AUTO_VOICE:-0}"
+  printf '1) Launch terminal dashboard\n2) Refresh system dashboard\n3) Test assistant voice\n4) Voice profile: %s\n5) Auto-start banner: %s\n6) Digital loading animation: %s\n7) Banner animation: %s\n8) Automatic voice: %s\n9) Change greeting\n10) Choose color theme\n11) Banner / FIGlet styles\n12) Font manager\n13) Clean settings / fresh install\n14) Update from GitHub\n15) Restore / uninstall\n16) Set startup command/app\n17) Voice setup tips\n18) Plugin manager\n19) Backup / restore settings\n20) Live system monitor\n21) Voice command shortcuts\n0) Exit\n' "${CYBERPUNK_VOICE_STYLE:-cinematic}" "${CYBERPUNK_AUTO_START:-1}" "${CYBERPUNK_LOADING:-1}" "${CYBERPUNK_ANIMATION:-1}" "${CYBERPUNK_AUTO_VOICE:-0}"
   read -r -p 'Select: ' choice || exit 0
   case "$choice" in
     1) "$HOME/.local/bin/cyberpunk" ;;
@@ -102,6 +102,26 @@ while true; do
       echo "Then run: cyberpunk-voice"
       echo "The cinematic profile requests lower pitch/slower speech; exact timbre depends on your TTS engine."
       echo "It does not clone Tony Stark or Robert Downey Jr.'s voice." ;;
+    18) "$HOME/.local/bin/cyberpunk-plugins" list
+      echo "1) Create starter plugin  2) Install local plugin  3) Run plugin  4) Remove plugin"
+      read -r -p 'Plugin action: ' plugin_action || exit 0
+      case "$plugin_action" in
+        1) read -r -p 'New plugin name: ' plugin_name || exit 0; "$HOME/.local/bin/cyberpunk-plugins" create "$plugin_name" ;;
+        2) read -r -p 'Path to local .sh plugin: ' plugin_path || exit 0; "$HOME/.local/bin/cyberpunk-plugins" install "$plugin_path" ;;
+        3) read -r -p 'Plugin name: ' plugin_name || exit 0; "$HOME/.local/bin/cyberpunk-plugins" run "$plugin_name" ;;
+        4) read -r -p 'Plugin name: ' plugin_name || exit 0; "$HOME/.local/bin/cyberpunk-plugins" remove "$plugin_name" ;;
+        *) echo "Cancelled." ;;
+      esac ;;
+    19) echo "1) Create backup  2) List backups  3) Restore latest / named backup"
+      read -r -p 'Backup action: ' backup_action || exit 0
+      case "$backup_action" in
+        1) "$HOME/.local/bin/cyberpunk-backup" create ;;
+        2) "$HOME/.local/bin/cyberpunk-backup" list ;;
+        3) read -r -p 'Backup name (latest for newest): ' backup_name || exit 0; "$HOME/.local/bin/cyberpunk-backup" restore "$backup_name" ;;
+        *) echo "Cancelled." ;;
+      esac ;;
+    20) "$HOME/.local/bin/cyberpunk-monitor" --watch 3 ;;
+    21) "$HOME/.local/bin/cyberpunk-listen" ;;
     0|q|Q) exit 0 ;;
     *) echo "Choose a listed option." ;;
   esac
