@@ -1,0 +1,21 @@
+#!/data/data/com.termux/files/usr/bin/bash
+set -euo pipefail
+say() { command -v termux-tts-speak >/dev/null 2>&1 && termux-tts-speak "$1" >/dev/null 2>&1 || true; printf '%s\n' "$1"; }
+command -v termux-speech-to-text >/dev/null 2>&1 || { echo "Install the matching Termux:API app and run: pkg install termux-api" >&2; exit 1; }
+echo "Listening for one safe Cyberpunk shortcut..."
+heard="$(termux-speech-to-text 2>/dev/null || true)"
+command_text="$(printf '%s' "$heard" | tr '[:upper:]' '[:lower:]' | sed 's/^[[:space:]]*//; s/[[:space:]]*$//')"
+[ -n "$command_text" ] || { say "I did not hear a command."; exit 1; }
+case "$command_text" in
+ *dashboard*|*system status*) say "Opening system dashboard."; exec "$HOME/.local/bin/cyberpunk-dashboard" ;;
+ *monitor*|*live status*) say "Opening live system monitor."; exec "$HOME/.local/bin/cyberpunk-monitor" --watch 3 ;;
+ *theme*|*appearance*) say "Opening theme list."; exec "$HOME/.local/bin/cyberpunk-style" --list ;;
+ *settings*|*manager*) say "Opening Cyberpunk control center."; exec "$HOME/.local/bin/cyberpunk-manager" ;;
+ *voice*|*speak*) say "Testing assistant voice."; exec "$HOME/.local/bin/cyberpunk-voice" ;;
+ *plugin*) say "Listing local plugins."; exec "$HOME/.local/bin/cyberpunk-plugins" list ;;
+ *backup*) say "Creating a settings backup."; exec "$HOME/.local/bin/cyberpunk-backup" create ;;
+ *update*) say "Opening the updater. Review its confirmation before updating."; exec "$HOME/.local/bin/cyberpunk-update" ;;
+ *help*|*commands*) say "Say dashboard, monitor, themes, settings, voice, plugins, backup, update, or cancel." ;;
+ *cancel*|*stop*|*exit*) say "Voice shortcut cancelled." ;;
+ *) say "Command not recognized. Say help for supported shortcuts."; exit 2 ;;
+esac
