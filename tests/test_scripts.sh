@@ -38,4 +38,11 @@ for theme in cyberpunk.properties matrix.properties dracula.properties nord.prop
   grep -q '^color15=#' "config/themes/$theme" || fail "theme color table: $theme"
 done
 pass "Theme collection and feature smoke checks"
-echo "All Termux Cyberpunk static tests passed."
+TMP_HOME="$(mktemp -d)"
+trap 'rm -rf "$TMP_HOME"' EXIT
+HOME="$TMP_HOME" bash bin/cyberpunk-plugins create ci-test >/dev/null || fail "plugin creation"
+HOME="$TMP_HOME" bash bin/cyberpunk-plugins run ci-test | grep -q 'Hello from your Cyberpunk plugin' || fail "plugin execution"
+HOME="$TMP_HOME" bash bin/cyberpunk-backup create >/dev/null || fail "backup creation"
+HOME="$TMP_HOME" bash bin/cyberpunk-backup list | grep -qE '[0-9]{8}-[0-9]{6}' || fail "backup listing"
+pass "Plugin and backup smoke tests"
+echo "All Termux Cyberpunk tests passed."
