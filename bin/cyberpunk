@@ -11,7 +11,13 @@ if [ "${CYBERPUNK_AUTO_VOICE:-0}" = 1 ]; then
   "$(dirname "$0")/cyberpunk-voice.sh" >/dev/null 2>&1 || true
 fi
 # Optional user-defined command/app to run after the startup display.
-if [ -n "${CYBERPUNK_STARTUP_COMMAND:-}" ]; then
+STARTUP_COMMAND=""
+if [ -n "${CYBERPUNK_STARTUP_COMMAND_B64:-}" ]; then
+  STARTUP_COMMAND="$(printf '%s' "$CYBERPUNK_STARTUP_COMMAND_B64" | base64 -d 2>/dev/null || true)"
+elif [ -n "${CYBERPUNK_STARTUP_COMMAND:-}" ]; then
+  STARTUP_COMMAND="$CYBERPUNK_STARTUP_COMMAND" # compatibility with older config files
+fi
+if [ -n "$STARTUP_COMMAND" ]; then
   printf '\033[1;36m[CYBERPUNK] Running your configured startup command...\033[0m\n'
-  eval "$CYBERPUNK_STARTUP_COMMAND"
+  eval "$STARTUP_COMMAND"
 fi
