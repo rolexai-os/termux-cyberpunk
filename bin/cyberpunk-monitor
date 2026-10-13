@@ -12,6 +12,6 @@ show() {
  printf '%s\n' "$G Storage and battery panels are intentionally omitted.$R"
  printf '%s\n' "$C════════════════════════════════════════════════════$R"
 }
-ACTION="$1"; [ -n "$ACTION" ] || ACTION=show
-if [ "$ACTION" = "--watch" ] || [ "$ACTION" = "-w" ]; then interval="$2"; [ -n "$interval" ] || interval=3; case "$interval" in *[!0-9]*|"") echo "Usage: cyberpunk-monitor [--watch [seconds]]" >&2; exit 2 ;; esac; [ "$interval" -ge 2 ] || interval=2; while :; do clear 2>/dev/null || true; show; echo "Refreshing every $interval seconds; Ctrl+C to stop."; sleep "$interval"; done
+ACTION="${1:-show}"
+if [ "$ACTION" = "--watch" ] || [ "$ACTION" = "-w" ]; then interval="${2:-3}"; case "$interval" in *[!0-9]*|"") echo "Usage: cyberpunk-monitor [--watch [seconds]]" >&2; exit 2 ;; esac; [ "$interval" -ge 2 ] || interval=2; while :; do clear 2>/dev/null || true; show; echo "Refreshing every $interval seconds; Ctrl+C to stop."; sleep "$interval"; done
 else show; fi
