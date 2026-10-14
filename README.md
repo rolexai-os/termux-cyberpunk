@@ -4,7 +4,7 @@ A lightweight, reversible terminal customization toolkit for Termux on Android 1
 
 ## Features
 
-- Cyberpunk neon palette plus thirteen selectable presets: Matrix, Dracula, Nord, Gruvbox, Solarized Dark, Monokai, Synthwave, Ocean, Amber, Bloodmoon, Forest, Arctic and Vaporwave
+- Cyberpunk neon palette plus thirteen selectable presets: Matrix, Dracula, Nord, Gruvbox, Solarized Dark, Monokai, Synthwave, Ocean, Amber, Bloodmoon, Forest, Arctic, Vaporwave and Plasma Breeze
 - Safe theme switching with timestamped backups of your previous palette
 - Banner styles: built-in Cyberpunk, Matrix, compact, FIGlet, TOIlet and optional rainbow output with lolcat
 - Font manager for local TrueType fonts, with backup, restore and reset commands
@@ -112,6 +112,7 @@ Presets are stored under `config/themes/` in the repository and copied to `~/.lo
 - `forest` — green natural palette
 - `arctic` — cool blue and ice
 - `vaporwave` — pink, violet and cyan
+- `plasma-breeze` — KDE Plasma-inspired dark blue-gray with Breeze cyan accents
 
 Every theme switch saves the previous `~/.termux/colors.properties` under `~/.local/share/termux-cyberpunk/theme-backups/`. Run `termux-reload-settings` when available; restart Termux if colors do not refresh.
 
@@ -227,3 +228,14 @@ Use `cyberpunk-plugins create my-plugin` to create a starter under `~/.local/sha
 ## Backups and restore
 
 `cyberpunk-backup create` saves the Cyberpunk config, Termux color palette, Termux properties and optional custom font under `~/.local/share/termux-cyberpunk/manual-backups/`. Restore asks for confirmation and first creates a safety backup of the current state. Upgrades continue to preserve the existing config and customized terminal properties where possible.
+
+
+### KDE Plasma-inspired Breeze palette
+
+Apply the new terminal palette with:
+
+```bash
+cyberpunk-style plasma-breeze
+```
+
+This adds KDE's Breeze-inspired dark background, cool blue-gray surfaces, and cyan highlights to **Termux terminal colors**. It does not install or change a KDE Plasma desktop environment; the theme format here is Termux's `colors.properties`. The palette is inspired by KDE's Breeze scheme ([KDE Breeze project](https://github.com/KDE/breeze), [Konsole Breeze colors](https://github.com/KDE/konsole/blob/master/data/color-schemes/Breeze.colorscheme)).
