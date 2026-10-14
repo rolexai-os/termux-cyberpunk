@@ -32,7 +32,7 @@ grep -q 'manual-backups' bin/cyberpunk-backup || fail "manual backup storage"
 grep -q 'Network counters' bin/cyberpunk-monitor || fail "live monitor network counters"
 grep -q 'Review the source' bin/cyberpunk-plugins || fail "plugin manager safety guidance"
 if grep -qE 'Storage|Battery|termux-battery-status|df -h' bin/cyberpunk-dashboard.sh; then fail "dashboard should omit storage and battery details"; fi
-for theme in cyberpunk.properties matrix.properties dracula.properties nord.properties gruvbox.properties solarized-dark.properties monokai.properties synthwave.properties ocean.properties amber.properties bloodmoon.properties forest.properties arctic.properties vaporwave.properties; do
+for theme in cyberpunk.properties matrix.properties dracula.properties nord.properties gruvbox.properties solarized-dark.properties monokai.properties synthwave.properties ocean.properties amber.properties bloodmoon.properties forest.properties arctic.properties vaporwave.properties plasma-breeze.properties; do
   [ -s "config/themes/$theme" ] || fail "missing theme: $theme"
   grep -q '^background=#' "config/themes/$theme" || fail "theme background: $theme"
   grep -q '^color15=#' "config/themes/$theme" || fail "theme color table: $theme"
